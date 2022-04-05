@@ -32,7 +32,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     '&:focus': {
       outline: 'none',
       borderColor: theme.colors.blue[7],
-      borderWidth: '2px',
+      borderWidth: '1px',
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[0]
     },
 
