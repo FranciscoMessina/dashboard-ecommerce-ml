@@ -1,4 +1,15 @@
-import { Center, ScrollArea, Grid, Group, MediaQuery, Text, Loader } from '@mantine/core'
+import {
+  Center,
+  ScrollArea,
+  Grid,
+  Group,
+  MediaQuery,
+  Text,
+  Loader,
+  Container,
+  Box,
+  Tabs
+} from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { Layout } from '../components/Layout'
 
@@ -31,19 +42,53 @@ export default function Questions() {
   }
 
   return (
-    <Grid columns={5} gutter="md" justify="center" grow>
-      <Grid.Col span={4}>
-        <Group direction="column">
-          {data?.data.questions?.length! > 0 ? (
-            data?.data.questions.map((question: MeliQuestionData) =>
-              question.status === 'UNANSWERED' ? (
-                <Question question={question} key={question.id} />
-              ) : null
-            )
-          ) : (
+    <Center>
+      <Tabs>
+        <Tabs.Tab label="Pendientes">
+          <Container fluid px={0}>
+            <Group noWrap align="start" position="center">
+              <Group direction="column">
+                {data?.data.questions?.length! > 0 ? (
+                  data?.data.questions.map((question: MeliQuestionData) =>
+                    question.status === 'UNANSWERED' ? (
+                      <Question question={question} key={question.id} />
+                    ) : null
+                  )
+                ) : (
+                  <Center
+                    sx={(theme) => ({
+                      width: '100%',
+                      border: '1px solid',
+                      borderRadius: theme.radius.sm,
+                      borderColor: theme.colors.teal[5],
+                      backgroundColor: theme.colorScheme === 'dark' ? '' : theme.colors.teal[1]
+                    })}
+                    mt={14}
+                  >
+                    <Text color="teal">
+                      Ya respondiste todas las preguntas! O algo salio mal, no esta tan completo
+                      esto.
+                    </Text>
+                  </Center>
+                )}
+              </Group>
+
+              <QuickAnswersDisplay />
+            </Group>
+          </Container>
+        </Tabs.Tab>
+        <Tabs.Tab label="Historial">
+          <Container
+            size="xl"
+            sx={(theme) => ({
+              [theme.fn.largerThan('xl')]: {
+                minWidth: theme.breakpoints.xl + 185
+              }
+            })}
+            px={0}
+          >
             <Center
               sx={(theme) => ({
-                width: '100%',
                 border: '1px solid',
                 borderRadius: theme.radius.sm,
                 borderColor: theme.colors.teal[5],
@@ -51,18 +96,11 @@ export default function Questions() {
               })}
               mt={14}
             >
-              <Text color="teal">
-                Ya respondiste todas las preguntas! O algo salio mal, no esta tan completo esto.
-              </Text>
+              <Text color="teal">Aca va ir el historial de preguntas respondidas.</Text>
             </Center>
-          )}
-        </Group>
-      </Grid.Col>
-      <MediaQuery smallerThan={'md'} styles={{ display: 'none' }}>
-        <Grid.Col span={1}>
-          <QuickAnswersDisplay />
-        </Grid.Col>
-      </MediaQuery>
-    </Grid>
+          </Container>
+        </Tabs.Tab>
+      </Tabs>
+    </Center>
   )
 }

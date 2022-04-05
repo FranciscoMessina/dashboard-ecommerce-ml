@@ -250,14 +250,15 @@ export const Question: React.FC<QuestionProps> = ({ question, ...rest }) => {
 
   return (
     <Container
-      size="xl"
+      size='xl'
       sx={(theme) => ({
         [theme.fn.largerThan('xl')]: {
           minWidth: '1000px'
         }
       })}
+      px={0}
     >
-      <Paper p="md" radius="sm" shadow="md" m="sm">
+      <Paper p="md" radius="sm" shadow="md" >
         <MediaQuery largerThan={'md'} styles={{ display: 'none' }}>
           <Anchor href={question.item.permalink} target="_blank" rel="noreferrer" mb="xl">
             {question.item.title}

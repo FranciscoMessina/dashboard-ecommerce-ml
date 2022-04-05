@@ -1,6 +1,17 @@
-import { createStyles, Group, Navbar, Tooltip, UnstyledButton } from '@mantine/core'
+import {
+  createStyles,
+  Group,
+  Navbar,
+  Overlay,
+  Tooltip,
+  Transition,
+  UnstyledButton,
+  useMantineTheme
+} from '@mantine/core'
+import { useClickOutside, useViewportSize } from '@mantine/hooks'
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import {
   Box,
   Home2,
@@ -12,6 +23,7 @@ import {
   Settings
 } from 'tabler-icons-react'
 import { authAtom } from '../atoms/authAtom'
+import { navbarAtom } from '../atoms/navbarAtom'
 import { useAuth } from '../hooks/useAuth'
 
 const useStyles = createStyles((theme) => ({
@@ -70,6 +82,10 @@ function NavbarLink({ icon: Icon, label, onClick, route }: NavbarLinkProps) {
 }
 
 export function Sidebar() {
+  const [open, setOpen] = useRecoilState(navbarAtom)
+
+
+  const theme = useMantineTheme()
   const navLinks = [
     { icon: Home2, label: 'Inicio', route: '/' },
     {
@@ -81,28 +97,57 @@ export function Sidebar() {
     { icon: Plus, label: 'Publicar', route: '/publish' }
   ]
 
+  const { width } = useViewportSize()
+
+  const alwaysShow = width > theme.breakpoints.sm
+
   const { auth } = useAuth()
 
   const links = navLinks.map((link, index) => <NavbarLink {...link} key={link.label} />)
 
   return (
-    <Navbar width={{ base: 60 }} hidden={!open} hiddenBreakpoint="sm">
-      <Navbar.Section grow mt={20}>
-        <Group direction="column" align="center" spacing={2}>
-          {links}
-        </Group>
-      </Navbar.Section>
-      <Navbar.Section mb={10}>
-        <Group direction="column" align="center" spacing={1}>
-          <NavbarLink icon={Settings} label="Settings" route="/settings" />
+    <Transition
+      mounted={!open.open || alwaysShow}
+      transition="pop-top-left"
+      duration={400}
+      timingFunction="ease"
+    >
+      {(styles) => (
+        <>
+          <Navbar
+            width={{ base: 60 }}
+            hidden={open.open}
+            hiddenBreakpoint="sm"
+            style={styles}
+          >
+            <Navbar.Section grow mt={20}>
+              <Group direction="column" align="center" spacing={2}>
+                {links}
+              </Group>
+            </Navbar.Section>
+            <Navbar.Section mb={10}>
+              <Group direction="column" align="center" spacing={1}>
+                <NavbarLink icon={Settings} label="Settings" route="/settings" />
 
-          {auth.user ? (
-            <NavbarLink icon={Logout} label="Logout" route="/logout" />
-          ) : (
-            <NavbarLink icon={Login} label="Login" route="/logout" />
+                {auth.user ? (
+                  <NavbarLink icon={Logout} label="Logout" route="/logout" />
+                ) : (
+                  <NavbarLink icon={Login} label="Login" route="/logout" />
+                )}
+              </Group>
+            </Navbar.Section>
+          </Navbar>
+          {!alwaysShow && (
+            <Overlay
+              style={styles}
+              zIndex={10}
+              blur={1}
+              color={theme.colorScheme === 'dark' ? '#000' : '#fff'}
+              onClick={() => setOpen({ open: true })}
+            />
           )}
-        </Group>
-      </Navbar.Section>
-    </Navbar>
+        </>
+      )}
+    </Transition>
   )
 }

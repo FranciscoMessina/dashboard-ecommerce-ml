@@ -10,13 +10,17 @@ import {
   useMantineTheme
 } from '@mantine/core'
 import { Link } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
 import { MoonStars, Sun } from 'tabler-icons-react'
+import { navbarAtom } from '../atoms/navbarAtom'
 
 import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
 
 export function Topbar() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const theme = useMantineTheme()
+
+  const [open, setOpen] = useRecoilState(navbarAtom)
 
   const { data: questions } = useGetQuestionsQuery({})
 
@@ -43,8 +47,8 @@ export function Topbar() {
       >
         <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
           <Burger
-            opened={true}
-            onClick={() => console.log('clicked')}
+            opened={!open.open}
+            onClick={() => setOpen({ open: !open.open })}
             size="sm"
             color={theme.colors.gray[6]}
             mr="xl"

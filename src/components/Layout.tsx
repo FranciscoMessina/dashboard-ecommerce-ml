@@ -8,7 +8,7 @@ interface LayoutProps {}
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <ScrollArea sx={{ height: '100vh' }} scrollbarSize={6} offsetScrollbars>
+    <ScrollArea sx={{ height: '100vh' }} scrollbarSize={6} >
       <AppShell
         padding="md"
         fixed
