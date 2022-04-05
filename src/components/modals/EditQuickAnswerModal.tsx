@@ -9,7 +9,7 @@ type InnerProps = {
   name?: string
   text?: string
   color?: string
-  id?: number
+  _id?: string
 }
 
 export const EditQuickAnswerModal = ({
@@ -37,7 +37,7 @@ export const EditQuickAnswerModal = ({
 
   const editQuickAnswer = (values: typeof form.values) => {
     axios
-      .put(`/user/quickanswers/${innerProps.id}`, {
+      .put(`/user/quickanswers/${innerProps._id}`, {
         name: values.name,
         text: values.text,
         color: values.color

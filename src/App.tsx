@@ -3,7 +3,7 @@ import { Layout } from './components/Layout'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
 import { Home } from './pages/Home'
-import { ColorScheme, ColorSchemeProvider, Loader, MantineProvider } from '@mantine/core'
+import { Center, ColorScheme, ColorSchemeProvider, Loader, MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { NotificationsProvider } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -69,9 +69,9 @@ function App() {
                 <Route path="auth/login" element={<SignIn />} />
                 <Route path="auth/register" element={<SignUp />} />
                 <Route path="auth/unauthorized" element={<Unauthorized />} />
-                <Route path="/" element={<Layout />}>
                   {/* Protected Routes */}
 
+                <Route path="/" element={<Layout />}>
                   <Route element={<PersistLogin />}>
                     <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
                       <Route path="/" element={<Home />} />
@@ -79,7 +79,13 @@ function App() {
                       <Route
                         path="questions"
                         element={
-                          <React.Suspense fallback={<Loader />}>
+                          <React.Suspense
+                            fallback={
+                              <Center>
+                                <Loader />
+                              </Center>
+                            }
+                          >
                             <Questions />
                           </React.Suspense>
                         }
@@ -88,7 +94,13 @@ function App() {
                       <Route
                         path="sales"
                         element={
-                          <React.Suspense fallback={<Loader />}>
+                          <React.Suspense
+                            fallback={
+                              <Center>
+                                <Loader />
+                              </Center>
+                            }
+                          >
                             <Sales />
                           </React.Suspense>
                         }
@@ -97,15 +109,32 @@ function App() {
                       <Route
                         path="settings"
                         element={
-                          <React.Suspense fallback={<Loader />}>
+                          <React.Suspense
+                            fallback={
+                              <Center>
+                                <Loader />
+                              </Center>
+                            }
+                          >
                             <Settings />
                           </React.Suspense>
                         }
                       />
 
-                      <Route path="publish" element={ <React.Suspense fallback={<Loader />}>
+                      <Route
+                        path="publish"
+                        element={
+                          <React.Suspense
+                            fallback={
+                              <Center>
+                                <Loader />
+                              </Center>
+                            }
+                          >
                             <Publicator />
-                          </React.Suspense>} />
+                          </React.Suspense>
+                        }
+                      />
                     </Route>
                   </Route>
                 </Route>

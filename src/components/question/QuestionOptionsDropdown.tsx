@@ -5,9 +5,9 @@ import { useNotifications } from '@mantine/notifications'
 import { FC, useCallback } from 'react'
 import { useQueryClient } from 'react-query'
 import { Check, DotsVertical, PlayerPause, PlayerPlay, Trash, X } from 'tabler-icons-react'
-import axios from '../helpers/axios'
-import { useAuth } from '../hooks/useAuth'
-import { useAxiosInstance } from '../hooks/useAxios'
+import axios from '../../helpers/axios'
+import { useAuth } from '../../hooks/useAuth'
+import { useAxiosInstance } from '../../hooks/useAxios'
 
 interface QuestionOptionsDropdownProps {
   blockUser?: (id: number) => void

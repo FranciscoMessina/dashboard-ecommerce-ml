@@ -18,10 +18,10 @@ function QuickAnswersDisplay() {
         }}
         radius="sm"
       >
-        <Text weight={600} align="center" size="lg">
+        <Text weight={500} align="left" size="lg">
           Respuestas Rapidas
         </Text>
-        <Divider mb="md" mt="sm" />
+        <Divider mb="md" mt="xs" />
 
         <ScrollArea style={{ height: '80vh' }} type="hover">
           <Group align="center" spacing={6}>

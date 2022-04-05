@@ -2,7 +2,7 @@ import { Text, Group, Box, Paper, Collapse } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { FC } from 'react'
 import { ChevronDown, ChevronUp, Message, Message2 } from 'tabler-icons-react'
-import { PreviousQuestion } from '../types/types'
+import { PreviousQuestion } from '../../types/types'
 
 interface PreviousQuestionsProps {
   questions: PreviousQuestion[]

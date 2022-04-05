@@ -13,7 +13,7 @@ import {
 import { useDocumentTitle } from '@mantine/hooks'
 import { Layout } from '../components/Layout'
 
-import Question from '../components/Question'
+import Question from '../components/question/Question'
 import QuickAnswersDisplay from '../components/QuickAnswersDisplay'
 import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
 import { MeliQuestionData } from '../types/types'

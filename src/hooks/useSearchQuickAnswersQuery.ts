@@ -18,7 +18,7 @@ export const useSearchQuickAnswersQuery = (
   const axiosPrivate = useAxiosInstance()
   return useQuery<AxiosResponse<QuickAnswersSearchResult>, AxiosError>(
     ['quickanswers-search', query],
-    () => axiosPrivate.get<QuickAnswersSearchResult>(`/quickanswers?q=${query}`),
+    () => axiosPrivate.get<QuickAnswersSearchResult>(`user/quickanswers?q=${query}`),
     {
       ...options
     }
