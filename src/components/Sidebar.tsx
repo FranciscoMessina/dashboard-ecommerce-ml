@@ -107,7 +107,7 @@ export function Sidebar() {
 
   return (
     <Transition
-      mounted={!open.open || alwaysShow}
+      mounted={!open || alwaysShow}
       transition="pop-top-left"
       duration={400}
       timingFunction="ease"
@@ -116,7 +116,7 @@ export function Sidebar() {
         <>
           <Navbar
             width={{ base: 60 }}
-            hidden={open.open}
+            hidden={open}
             hiddenBreakpoint="sm"
             style={styles}
           >
@@ -143,7 +143,7 @@ export function Sidebar() {
               zIndex={10}
               blur={1}
               color={theme.colorScheme === 'dark' ? '#000' : '#fff'}
-              onClick={() => setOpen({ open: true })}
+              onClick={() => setOpen(true)}
             />
           )}
         </>

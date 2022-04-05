@@ -47,8 +47,8 @@ export function Topbar() {
       >
         <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
           <Burger
-            opened={!open.open}
-            onClick={() => setOpen({ open: !open.open })}
+            opened={!open}
+            onClick={() => setOpen(!open)}
             size="sm"
             color={theme.colors.gray[6]}
             mr="xl"
