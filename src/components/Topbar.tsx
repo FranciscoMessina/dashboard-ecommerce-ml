@@ -1,0 +1,97 @@
+import {
+  ActionIcon,
+  Group,
+  Header,
+  Text,
+  useMantineColorScheme,
+  Badge,
+  MediaQuery,
+  Burger,
+  useMantineTheme
+} from '@mantine/core'
+import { Link } from 'react-router-dom'
+import { MoonStars, Sun } from 'tabler-icons-react'
+
+import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
+
+export function Topbar() {
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  const theme = useMantineTheme()
+
+  const { data: questions } = useGetQuestionsQuery({})
+
+  // const dispatch = useDispatch()
+
+  // function toggleDispatch() {
+  //   if (open) {
+  //     dispatch(modalClose())
+  //   } else {
+  //     dispatch(modalOpen())
+  //   }
+  // }
+
+  return (
+    <Header height={60}>
+      <Group
+        direction="row"
+        position="apart"
+        align={'center'}
+        px="md"
+        sx={{
+          height: '100%'
+        }}
+      >
+        <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+          <Burger
+            opened={true}
+            onClick={() => console.log('clicked')}
+            size="sm"
+            color={theme.colors.gray[6]}
+            mr="xl"
+          />
+        </MediaQuery>
+        <MediaQuery smallerThan={'sm'} styles={{ display: 'none' }}>
+          <Text
+            size="xl"
+            inline
+            sx={{
+              fontSize: '2.5rem',
+              fontFamily: "'Playfair Display', 'serif'"
+            }}
+          >
+            El Rio Libros
+          </Text>
+        </MediaQuery>
+
+        <Group sx={{ marginRight: 4 }}>
+          {questions?.data.total! > 0 && (
+            <Badge
+              component={Link}
+              to="questions"
+              sx={(theme) => ({
+                [theme.fn.smallerThan('md')]: {
+                  display: 'none'
+                }
+              })}
+            >
+              Preguntas: {questions?.data.total}
+            </Badge>
+          )}
+          <Group position="center">
+            <ActionIcon
+              onClick={() => toggleColorScheme()}
+              size="lg"
+              sx={(theme) => ({
+                backgroundColor:
+                  theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                color: theme.colorScheme === 'dark' ? theme.colors.yellow[4] : theme.colors.blue[6]
+              })}
+            >
+              {colorScheme === 'dark' ? <Sun size={18} /> : <MoonStars size={18} />}
+            </ActionIcon>
+          </Group>
+        </Group>
+      </Group>
+    </Header>
+  )
+}
