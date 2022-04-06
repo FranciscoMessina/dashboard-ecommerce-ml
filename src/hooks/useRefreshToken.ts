@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
-import { axiosPrivate } from '../helpers/axios'
+import axios from '../helpers/axios'
 import { useAuth } from './useAuth'
 
 export const useRefreshToken = () => {
   const { auth, setAuth } = useAuth()
 
   const refresh = useCallback(async () => {
-    const response = await axiosPrivate.get('auth/refresh')
+    const response = await axios.get('auth/refresh')
 
     console.log('Refresh response', response)
 

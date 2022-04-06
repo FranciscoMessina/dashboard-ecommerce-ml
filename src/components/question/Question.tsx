@@ -31,6 +31,7 @@ import { FullMeliItem, MeliQuestionData, QuickAnswer } from '../../types/types'
 import InputWithAutocomplete from './InputWithAutocomplete'
 import PreviousQuestions from './PreviousQuestions'
 import { QuestionOptionsDropdown } from './QuestionOptionsDropdown'
+import TypeahedInput from './TypeaheadInput'
 
 interface QuestionProps {
   question: MeliQuestionData
@@ -177,7 +178,8 @@ export const Question: React.FC<QuestionProps> = ({ question, ...rest }) => {
           <Box sx={{ width: '100%' }}>
             {!answerQuestionMutation.isLoading ? (
               <Box>
-                <InputWithAutocomplete answerQuestion={answerQuestionMutation.mutate} dateCreated={question.date_created} questionId={question.id} />
+                {/* <InputWithAutocomplete answerQuestion={answerQuestionMutation.mutate} dateCreated={question.date_created} questionId={question.id} /> */}
+                <TypeahedInput answerQuestion={answerQuestionMutation.mutate} dateCreated={question.date_created} questionId={question.id}/>
 
                 {question.previous.length > 0 && (
                   <PreviousQuestions questions={question.previous} buyer={question.from.nickname} />

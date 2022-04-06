@@ -149,7 +149,8 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
   const QuickAnswersQuery = useSearchQuickAnswersQuery(query.slice(1), {
     enabled: false
   })
-
+  const searchQuickAnswers = QuickAnswersQuery.refetch
+  
   const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (shouldOpen) {
       e.preventDefault()
@@ -162,7 +163,6 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
     }
   }
 
-  const searchQuickAnswers = QuickAnswersQuery.refetch
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -306,37 +306,7 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
                     value={value}
                     as="div"
                   >
-                    {({ active }) => (
-                      <Group
-                        className={classes.comboboxOption}
-                        spacing={12}
-                        position="apart"
-                        p={4}
-                        sx={(theme) => ({
-                          borderLeft: 4,
-                          borderLeftStyle: 'solid',
-                          borderColor: active ? theme.colors.blue[9] : 'transparent'
-                        })}
-                      >
-                        {'secure_thumbnail' in value && (
-                          <Box>
-                            <Image
-                              src={value.secure_thumbnail}
-                              alt={value.title}
-                              fit="contain"
-                              sx={(theme) => ({
-                                width: '1.5rem',
-                                height: '1.5rem'
-                              })}
-                            />
-                          </Box>
-                        )}
-                        <Text size="sm" transform={'name' in value ? 'uppercase' : 'none'}>
-                          {'name' in value ? value.name : value.title}
-                        </Text>
-                        {'price' in value && <Text size="sm">${value.price}</Text>}
-                      </Group>
-                    )}
+                  
                   </Combobox.Option>
                 ))}
               </Paper>

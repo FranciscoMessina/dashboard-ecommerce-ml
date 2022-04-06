@@ -13,6 +13,7 @@ declare module 'next-auth' {
 }
 
 export interface QuickAnswer {
+  [key: string]: any
   _id: string
   name: string
   text: string
