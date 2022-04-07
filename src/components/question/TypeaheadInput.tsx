@@ -1,4 +1,9 @@
-import { AutocompleteOptions } from '@algolia/autocomplete-core'
+import {
+  AutocompleteApi,
+  AutocompleteOptions,
+  InternalAutocompleteSource,
+  OnSelectParams
+} from '@algolia/autocomplete-core'
 import {
   Box,
   createStyles,
@@ -18,7 +23,10 @@ import { useAutocomplete } from '../../hooks/useAutocomplete'
 import { useAxiosInstance } from '../../hooks/useAxios'
 import { AutocompleteItem } from '../../types/autocomplete'
 import getCaretCoordinates from 'textarea-caret'
-import { MeliItem, MeliItemData } from '../../types/types'
+import { MeliItem, MeliItemData, QuickAnswer } from '../../types/types'
+import { QuickAnswersSource } from './QuickAnswersSource'
+import { MeliItemSource } from './MeliItemSource'
+import { debounce } from 'lodash'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   textarea: {
@@ -65,36 +73,31 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     zIndex: 10,
     paddingBlock: 2,
     minWidth: '100px'
-  },
-  resultsList: {
-    listStyle: 'none',
-    padding: 5,
-    margin: 0,
-    maxHeight: '200px'
-  },
-  result: {
-    display: 'flex',
-    minWidth: 150,
-    cursor: 'pointer',
-    alignItems: 'center',
-    justifyContent: 'start'
-  },
-
-  active: {
-    '&, &:hover': {
-      backgroundColor:
-        theme.colorScheme === 'dark'
-          ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
-          : theme.colors[theme.primaryColor][0],
-      color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 7]
-    }
   }
 }))
+
+function debouncePromise(fn: (args: any) => Promise<any>, time: number) {
+  let timerId: any = undefined;
+
+  return function debounced(...args: any) {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+
+    return new Promise((resolve) => {
+      // @ts-ignore
+      timerId = setTimeout(() => resolve(fn(...args)), time);
+    });
+  };
+}
 
 const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = (props) => {
   const { classes, theme, cx } = useStyles()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const axios = useAxiosInstance()
+
+  const debounced = debouncePromise((items: QuickAnswer[] | MeliItem[]) => Promise.resolve(items), 500)
+  
 
   const { autocomplete, state } = useAutocomplete({
     ...props,
@@ -106,10 +109,10 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
 
       if (activeToken?.word) {
         if (/^[@]\w{0,30}$/.test(activeToken?.word)) {
-          return [
+          return debounced([
             {
               sourceId: 'quickanswers',
-              onSelect({ item, setQuery }) {
+              onSelect({ item, setQuery }: OnSelectParams<QuickAnswer>) {
                 const [index] = activeToken.range
                 const replacement = `${item.text} `
                 const newQuery = replaceAt(query, replacement, index, activeToken.word.length)
@@ -126,17 +129,18 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
                 return response.data.quickAnswers
               }
             }
-          ]
+          ])
         }
 
         if (/^[#]\w{3,30}$/.test(activeToken?.word)) {
-          return [
+          return debounced([
             {
               sourceId: 'items',
-              onSelect({ item, setQuery }) {
+              onSelect({ item, setQuery }: OnSelectParams<MeliItem>) {
                 const [index] = activeToken.range
-                const replacement = `${item.permalink} `
+                const replacement = `${item.permalink} ${item.price} `
                 const newQuery = replaceAt(query, replacement, index, activeToken.word.length)
+                console.log('Aca estoy')
 
                 setQuery(newQuery)
 
@@ -150,7 +154,7 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
                 return response.data.items
               }
             }
-          ]
+          ])
         }
       }
 
@@ -233,37 +237,18 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
                   radius="xs"
                 >
                   {items.length > 0 && (
-                    <ul {...autocomplete.getListProps()} className={classes.resultsList}>
-                      {items.map((item) => {
-                        const itemProps = autocomplete.getItemProps({
-                          item,
-                          source
-                        })
-
-                        return (
-                          <li
-                            key={item._id}
-                            {...itemProps}
-                            className={cx(classes.result, {
-                              [classes.active]: itemProps['aria-selected']
-                            })}
-                          >
-                            <Box
-                              p={5}
-                              sx={(theme) => ({
-                                borderLeft: 4,
-                                borderLeftStyle: 'solid',
-                                borderColor: itemProps['aria-selected']
-                                  ? theme.colors.yellow[9]
-                                  : 'transparent'
-                              })}
-                            >
-                              {item.name}
-                            </Box>
-                          </li>
-                        )
-                      })}
-                    </ul>
+                    <QuickAnswersSource
+                      autocomplete={
+                        autocomplete as unknown as AutocompleteApi<
+                          QuickAnswer,
+                          React.BaseSyntheticEvent<object, any, any>,
+                          React.MouseEvent<Element, MouseEvent>,
+                          React.KeyboardEvent<Element>
+                        >
+                      }
+                      items={items as QuickAnswer[]}
+                      source={source as unknown as InternalAutocompleteSource<QuickAnswer>}
+                    />
                   )}
                 </Paper>
               )
@@ -279,26 +264,18 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
                 radius="xs"
               >
                 {items.length > 0 && (
-                  <ul {...autocomplete.getListProps()} className={classes.resultsList}>
-                    {items.map((item) => {
-                      const itemProps = autocomplete.getItemProps({
-                        item,
-                        source
-                      })
-
-                      return (
-                        <li
-                          key={item.id}
-                          {...itemProps}
-                          className={cx(classes.result, {
-                            [classes.active]: itemProps['aria-selected']
-                          })}
-                        >
-                          <MeliItemResult item={item} active={itemProps['aria-selected']} />
-                        </li>
-                      )
-                    })}
-                  </ul>
+                  <MeliItemSource
+                    autocomplete={
+                      autocomplete as unknown as AutocompleteApi<
+                        MeliItem,
+                        React.BaseSyntheticEvent<object, any, any>,
+                        React.MouseEvent<Element, MouseEvent>,
+                        React.KeyboardEvent<Element>
+                      >
+                    }
+                    items={items as unknown as MeliItem[]}
+                    source={source as unknown as InternalAutocompleteSource<MeliItem>}
+                  />
                 )}
               </Paper>
             )
@@ -309,38 +286,3 @@ const TypeahedInput: React.FC<Partial<AutocompleteOptions<AutocompleteItem>>> = 
 }
 
 export default TypeahedInput
-
-interface MeliItemResultProps {
-  item: MeliItem
-  active: boolean
-}
-
-function MeliItemResult({ item, active }: MeliItemResultProps) {
-  const { classes } = useStyles()
-  return (
-    <Group
-      className={classes.result}
-      spacing={12}
-      position="apart"
-      p={4}
-      sx={(theme) => ({
-        borderLeft: 4,
-        borderLeftStyle: 'solid',
-        borderColor: active ? theme.colors.yellow[9] : 'transparent'
-      })}
-    >
-      <Image
-        src={item.secure_thumbnail}
-        alt={item.title}
-        fit="contain"
-        sx={(theme) => ({
-          width: '1.5rem',
-          height: '1.5rem'
-        })}
-      />
-
-      <Text size="sm">{item.title}</Text>
-      <Text size="sm">${item.price}</Text>
-    </Group>
-  )
-}

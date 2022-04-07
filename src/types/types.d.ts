@@ -65,6 +65,7 @@ export interface PreviousQuestion {
 }
 
 export interface MeliItem {
+  [key: string]: any
   id: string
   title: string
   price: number

@@ -179,7 +179,7 @@ export const Question: React.FC<QuestionProps> = ({ question, ...rest }) => {
             {!answerQuestionMutation.isLoading ? (
               <Box>
                 {/* <InputWithAutocomplete answerQuestion={answerQuestionMutation.mutate} dateCreated={question.date_created} questionId={question.id} /> */}
-                <TypeahedInput answerQuestion={answerQuestionMutation.mutate} dateCreated={question.date_created} questionId={question.id}/>
+                <TypeahedInput />
 
                 {question.previous.length > 0 && (
                   <PreviousQuestions questions={question.previous} buyer={question.from.nickname} />

@@ -12,11 +12,11 @@ export const useAxiosInstance = () => {
       (response) => response,
       async (error) => {
         const prevRequest = error?.config
-        console.log(prevRequest)
+        // console.log(prevRequest)
 
         console.log(error.response)
 
-        if (error?.response?.status === 403 && !prevRequest?.sent) {
+        if (error?.response?.status === 401 && !prevRequest?.sent) {
           prevRequest.sent = true
 
           const token = await refresh()
