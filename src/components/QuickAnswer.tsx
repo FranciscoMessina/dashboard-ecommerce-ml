@@ -4,12 +4,13 @@ import { DragEventHandler } from 'react'
 interface QuickAnswerProps {
   text: string
   name: string
-  _id: string
+  id: string
   color: string
   draggable?: boolean
+  width?: number
 }
 
-function QuickAnswer({ text, name, _id, color, draggable }: QuickAnswerProps) {
+function QuickAnswer({ text, name, id, color, draggable, width }: QuickAnswerProps) {
   const dragStart: DragEventHandler<HTMLDivElement> = (e) => {
     const target = e.target
 
@@ -30,19 +31,20 @@ function QuickAnswer({ text, name, _id, color, draggable }: QuickAnswerProps) {
       px={4}
       style={{
         backgroundColor: color,
-        width: '95%',
+        width: width ? `${width}` : `220px`,
         textTransform: 'uppercase',
-        cursor: draggable ? 'pointer' : 'default',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
+        cursor: draggable ? 'pointer' : 'default'
       }}
       data-value={text}
-      data-id={_id}
-      my={2}
+      data-id={id}
+      my={6}
     >
       <Center>
-        <Text weight={600} color="white">
+        <Text
+          weight={600}
+          color="white"
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+        >
           {name}
         </Text>
       </Center>

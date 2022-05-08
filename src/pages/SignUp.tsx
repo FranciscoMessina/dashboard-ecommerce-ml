@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Anchor,
   Button,
@@ -8,10 +9,12 @@ import {
   TextInput,
   Title
 } from '@mantine/core'
-import { useForm, yupResolver } from '@mantine/form'
 import { useDocumentTitle } from '@mantine/hooks'
+import { useForm } from 'react-hook-form'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import axios from '../helpers/axios'
+import { useAuth } from '../hooks/useAuth.js'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -51,42 +54,65 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+interface SignUpFormData {
+  email: string
+  password: string
+  passwordConfirm: string
+}
+
 export function SignUp() {
   useDocumentTitle('Registro - El Rio Libros')
   const { classes } = useStyles()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { setAuth} = useAuth()
 
-  const submit = async (values: typeof form.values) => {
-    const response = await axios.post('/auth/register', {
-      email: values.email,
-      password: values.password
-    })
-    console.log(response)
-
-    if (response.data.logged) {
-      // if (typeof router.query.next === 'string') {
-      //   router.push(router.query.next)
-      // } else {
-      //   router.push('/')
-      // }
-    }
-  }
+  console.log(location)
 
   const schema = Yup.object({
     email: Yup.string()
       .required('Por favor completar!')
       .email('Por favor ingresar un email valido'),
     password: Yup.string().required('Por favor completar!'),
-    passwordConfirm: Yup.string().equals([Yup.ref('password')], 'Las contraseñas no coinciden')
+    passwordConfirm: Yup.string()
+      .required('Por favor completar!')
+      .equals([Yup.ref('password')], 'Las contraseñas no coinciden')
   })
 
-  const form = useForm({
-    initialValues: {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<SignUpFormData>({
+    defaultValues: {
       email: '',
       password: '',
       passwordConfirm: ''
     },
-    schema: yupResolver(schema)
+    resolver: yupResolver(schema)
   })
+
+  const onSubmit = async (values: SignUpFormData) => {
+    try {
+      const response = await axios.post('/auth/signup', {
+        email: values.email,
+        password: values.password
+      })
+      console.log(response)
+
+      if (response.data.accessToken) {
+        setAuth({
+          accessToken: response.data.accessToken,
+          roles: response.data.roles,
+          user: response.data.id,
+          persist: true
+        })
+        navigate('/')
+      }
+    } catch (err: any) {
+      console.log(err.response)
+    }
+  }
 
   return (
     <div className={classes.wrapper}>
@@ -95,36 +121,39 @@ export function SignUp() {
           Crea tu cuenta!
         </Title>
 
-        <form onSubmit={form.onSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
             label="Email"
             placeholder="hola@gmail.com"
             size="md"
-            {...form.getInputProps('email')}
+            {...register('email')}
+            error={errors.email?.message}
           />
           <PasswordInput
             label="Contraseña"
             placeholder="Tu contraseña"
             mt="md"
             size="md"
-            {...form.getInputProps('password')}
+            {...register('password')}
+            error={errors.password?.message}
           />
           <PasswordInput
             label="Confirmar contraseña"
             placeholder="Confirmar contraseña"
             mt="md"
             size="md"
-            {...form.getInputProps('passwordConfirm')}
+            {...register('passwordConfirm')}
+            error={errors.passwordConfirm?.message}
           />
 
           <Button fullWidth mt="xl" size="md" type="submit">
-            Conectar
+            Crear cuenta
           </Button>
         </form>
 
         <Text align="center" mt="md">
           Ya tenes una cuenta?{' '}
-          <Anchor href="/auth/login" weight={700}>
+          <Anchor component={Link} to="/auth/signin" weight={700} state={location.state}>
             Conectate
           </Anchor>
         </Text>

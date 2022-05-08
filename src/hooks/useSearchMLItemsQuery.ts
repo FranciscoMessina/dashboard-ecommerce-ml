@@ -6,17 +6,17 @@ import { useAxiosInstance } from './useAxios'
 
 export interface MeliItemsSearchResult {
   status: string
-  items: MeliItem[]
+  results: MeliItem[]
 }
 
 export const useSearchMLItemQuery = (
   query: string,
-  options: UseQueryOptions<AxiosResponse<MeliItemsSearchResult>, AxiosError>
+  options?: UseQueryOptions<AxiosResponse<MeliItemsSearchResult>, AxiosError>
 ) => {
   const axiosPrivate = useAxiosInstance()
   return useQuery<AxiosResponse<MeliItemsSearchResult>, AxiosError>(
-    ['ml-item-search', query],
-    () => axiosPrivate.get<MeliItemsSearchResult>(`ml/items/search?q=${query}`),
+    ['meli-item-search', query],
+    () => axiosPrivate.get<MeliItemsSearchResult>(`meli/items/search?q=${query}`),
     {
       ...options
     }

@@ -7,8 +7,8 @@ import { useAxiosInstance } from '../../hooks/useAxios'
 
 interface QuestionsConfigProps {
   messages?: {
-    preAnswer?: string
-    postAnswer?: string
+    hello?: string
+    signature?: string
   }
 }
 
@@ -16,6 +16,9 @@ export function QuestionsConfig({ messages }: QuestionsConfigProps) {
   const queryClient = useQueryClient()
   const modals = useModals()
   const axios = useAxiosInstance()
+
+  console.log(messages);
+  
 
   const addPreAnswerMessage = async () => {
     modals.openContextModal('addPreAnswer', {
@@ -32,7 +35,7 @@ export function QuestionsConfig({ messages }: QuestionsConfigProps) {
   }
 
   const deletePreAnswer = async () => {
-    const response = await axios.delete('/user/preanswer')
+    const response = await axios.delete('/users/hello')
     await queryClient.invalidateQueries('user-config')
   }
   const addPostAnswerMessage = async () => {
@@ -50,7 +53,7 @@ export function QuestionsConfig({ messages }: QuestionsConfigProps) {
   }
 
   const deletePostAnswer = async () => {
-    const response = await axios.delete('/user/postanswer')
+    const response = await axios.delete('/users/signature')
     await queryClient.invalidateQueries('user-config')
   }
 
@@ -82,16 +85,16 @@ export function QuestionsConfig({ messages }: QuestionsConfigProps) {
             Saludo inicial:
           </Text>
           <Text inline ml={10}>
-            {messages?.preAnswer}
+            {messages?.hello}
           </Text>
         </Group>
         <Group>
-          {messages?.preAnswer ? (
+          {messages?.hello ? (
             <>
               <Button
                 color="yellow"
                 variant="subtle"
-                onClick={() => editPreAnswerMessage(messages.preAnswer!)}
+                onClick={() => editPreAnswerMessage(messages.hello!)}
               >
                 Editar
               </Button>
@@ -124,16 +127,16 @@ export function QuestionsConfig({ messages }: QuestionsConfigProps) {
             Saludo final:
           </Text>
           <Text inline ml={10}>
-            {messages?.postAnswer}
+            {messages?.signature}
           </Text>
         </Group>
         <Group>
-          {messages?.postAnswer ? (
+          {messages?.signature ? (
             <>
               <Button
                 color="yellow"
                 variant="subtle"
-                onClick={() => editPostAnswerMessage(messages.postAnswer!)}
+                onClick={() => editPostAnswerMessage(messages.signature!)}
               >
                 Editar
               </Button>

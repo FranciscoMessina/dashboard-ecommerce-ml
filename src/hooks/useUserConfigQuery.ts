@@ -10,7 +10,7 @@ export const useUserConfigQuery = (
 
   return useQuery<AxiosResponse<UserConfig>, AxiosError>(
     'user-config',
-    () => axiosPrivate.get<UserConfig>('/user/config'),
+    () => axiosPrivate.get<UserConfig>('/users/config'),
     {
       ...options
     }

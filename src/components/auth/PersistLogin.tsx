@@ -1,12 +1,15 @@
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRefreshToken } from '../../hooks/useRefreshToken'
+import { Center, Loader } from '@mantine/core'
 
 export const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true)
   const refresh = useRefreshToken()
   const { auth, setAuth } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     let isMounted = true
@@ -21,8 +24,6 @@ export const PersistLogin = () => {
       }
     }
 
-    // persist added here AFTER tutorial video
-    // Avoids unwanted call to verifyRefreshToken
     !auth?.accessToken && auth.persist ? verifyRefreshToken() : setIsLoading(false)
 
     return () => {
@@ -30,10 +31,30 @@ export const PersistLogin = () => {
     }
   }, [])
 
-  // useEffect(() => {
-  //   console.log(`isLoading: ${isLoading}`)
-  //   console.log(`aT: ${JSON.stringify(auth?.accessToken)}`)
-  // }, [isLoading])
+  // console.log(location)
 
-  return <>{!auth.persist ? <Outlet /> : isLoading ? <p>Loading...</p> : <Outlet />}</>
+  const authPaths = ['/auth/signin', '/auth/signup']
+
+  if (authPaths.includes(location.pathname) && auth?.accessToken) {
+    return <Navigate to="/" replace />
+  }
+
+  return (
+    <>
+      {!auth.persist ? (
+        <Outlet />
+      ) : isLoading ? (
+        <Center
+          sx={(theme) => ({
+            width: '100vw',
+            height: '100vh'
+          })}
+        >
+          <Loader size="xl" />
+        </Center>
+      ) : (
+        <Outlet />
+      )}
+    </>
+  )
 }

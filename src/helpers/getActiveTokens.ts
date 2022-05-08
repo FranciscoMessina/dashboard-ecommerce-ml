@@ -1,7 +1,7 @@
 export function getActiveToken(
   input: string,
   cursorPosition: number | undefined
-): { word: string; range: [number] } | undefined {
+): { word: string; range: number[] } | undefined {
   // recuperamos la posición actual del cursor
   if (cursorPosition === undefined) return undefined
   // creamos un array temporal para guardar las palabras

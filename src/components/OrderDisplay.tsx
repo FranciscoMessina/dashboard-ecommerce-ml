@@ -1,4 +1,5 @@
-import { Button, Checkbox, Divider, Group, Paper, Text } from '@mantine/core'
+import { Box, Button, Checkbox, Divider, Group, Paper, Text } from '@mantine/core'
+
 import OrderItemInfo from './OrderItemInfo'
 
 function OrderDisplay({ order }: any) {
@@ -12,9 +13,12 @@ function OrderDisplay({ order }: any) {
       })}
     >
       <Group position="apart" sx={(theme) => ({})} px="sm" py={6}>
-        <Group>
+        <Group align='center'>
           <Checkbox size="xs" radius="xs" aria-label="Seleccionar venta" />
-          <Text weight={600}>#{order.id} </Text>-
+
+          <Text weight={600}>#{order.id} </Text>
+          <Divider orientation="vertical" size='xs' style={{ height: '20px' }} my={4} />
+
           <Text size="sm" sx={{ fontStyle: 'italic' }}>
             {new Date(order.date_created).toLocaleDateString('es-AR', {
               day: 'numeric',
@@ -42,6 +46,7 @@ function OrderDisplay({ order }: any) {
           </Button>
         </Group>
       </Group>
+
       <Divider mb={6} p={0} />
       <Group px="xs" position="apart" py={6}>
         <OrderItemInfo order={order} />

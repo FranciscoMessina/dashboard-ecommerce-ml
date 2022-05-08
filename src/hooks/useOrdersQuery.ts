@@ -10,7 +10,7 @@ export const useOrdersQuery = (
 
   return useQuery<AxiosResponse<ApiOrdersResponse>, AxiosError>(
     'orders',
-    () => axiosPrivate.get<ApiOrdersResponse>(`ml/orders`),
+    () => axiosPrivate.get<ApiOrdersResponse>(`meli/orders`),
     {
       ...options
     }

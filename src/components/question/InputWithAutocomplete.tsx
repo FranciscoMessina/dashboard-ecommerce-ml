@@ -1,22 +1,34 @@
 import { Combobox } from '@headlessui/react'
-import { Group, Paper, ScrollArea, Box, Image, createStyles, Text, Checkbox } from '@mantine/core'
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import {
+  Box,
+  Center,
+  createStyles,
+  Group,
+  Loader,
+  Paper,
+  ScrollArea,
+  Text,
+  Transition
+} from '@mantine/core'
+import { getHotkeyHandler, mergeRefs, useDebouncedValue, useSetState } from '@mantine/hooks'
+import React, { ChangeEvent, useEffect, useRef } from 'react'
+import { useFormContext } from 'react-hook-form'
 import { Checks } from 'tabler-icons-react'
-import { QuickAnswer, FullMeliItem } from '../../types/types'
-import { useSetState, useDebouncedValue, upperFirst } from '@mantine/hooks'
-import { getActiveToken, getTimeAgo } from '../../helpers'
-import { useSearchMLItemQuery } from '../../hooks/useSearchMLItemsQuery'
-import { useSearchQuickAnswersQuery } from '../../hooks/useSearchQuickAnswersQuery'
 import getCaretCoordinates from 'textarea-caret'
-import { UseMutateFunction, useQueryClient } from 'react-query'
-import { useAnswerQuestion } from '../../hooks/useAnswerQuestion'
-import { useUserConfigQuery } from '../../hooks/useUserConfigQuery'
+import { getActiveToken } from '../../helpers'
+import { replaceAt } from '../../helpers/replaceAt.js'
+import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useSearchMLItemQuery } from '../../hooks/useSearchMLItemsQuery'
+import { useGetQuickAnswersQuery } from '../../hooks/useSearchQuickAnswersQuery'
+import { MeliItem, QuickAnswer } from '../../types/types'
+import { AutocompleteMeliItem } from './AutocompleteMeliItem.js'
+import { AutocompleteQuickAnswerOption } from './AutocompleteQuickAnswerOption.js'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   comboboxInput: {
     display: 'block',
     width: '100%',
-    height: '90px',
+    height: '100px',
     resize: 'none',
     appearance: 'none',
     borderRadius: '2px 0 0 2px',
@@ -36,109 +48,124 @@ const useStyles = createStyles((theme, _params, getRef) => ({
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[0]
     },
 
-    '&::placeholder': { fontStyle: 'italic' }
+    '&::placeholder': { fontStyle: 'italic' },
+
+    '&:disabled': {
+      color: theme.colors.gray[8]
+    }
   },
   comboboxButton: {
     position: 'absolute',
     right: 0,
     backgroundColor: theme.colors.blue[6],
     border: 0,
-    height: '100%',
+    height: '100px',
     paddingInline: '10px',
     cursor: 'pointer'
   },
-  // className='scrollbar-hide absolute z-10 max-h-32 w-max overflow-y-auto px-2 text-sm'
-
   comboboxOptions: {
     position: 'absolute',
     zIndex: 10,
     maxHeight: 60,
     paddingBlock: 2
   },
-  // className={`flex min-w-[150px] cursor-pointer items-center justify-start space-x-2 rounded-sm px-1 py-1 text-left shadow-md transition-all duration-100 ease-in-out ${
-  // 	active ? 'bg-purple-600' : 'bg-white'
-  // }`}
   comboboxOption: {
     display: 'flex',
     minWidth: 150,
     cursor: 'pointer',
     alignItems: 'center',
     justifyContent: 'start'
+  },
+  resultsList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    maxHeight: '200px'
+  },
+  result: {
+    display: 'flex',
+    minWidth: 150,
+    cursor: 'pointer',
+    alignItems: 'center',
+    justifyContent: 'start'
+  },
+  buttonError: {
+    backgroundColor: theme.colors.red[6]
+  },
+  textareaError: {
+    borderColor: theme.colors.red[6],
+    borderWidth: '1px',
+
+    '&:focus': {
+      outline: 'none',
+      borderColor: theme.colors.red[6],
+      borderWidth: '1px',
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[0]
+    }
+  },
+
+  active: {
+    '&, &:hover': {
+      backgroundColor:
+        theme.colorScheme === 'dark'
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
+          : theme.colors[theme.primaryColor][0],
+      color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 7]
+    }
   }
 }))
 
-interface InputWithAutocompleteProps {
-  answerQuestion: UseMutateFunction
-  questionId: number
-  dateCreated: Date
-}
+interface InputWithAutocompleteProps {}
 
-const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
-  answerQuestion,
-  questionId,
-  dateCreated
-}) => {
-  const { classes, theme } = useStyles()
+const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
+  const { classes, theme, cx } = useStyles()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const submitBtnRef = useRef<HTMLButtonElement>(null)
+  const axios = useAxiosInstance()
 
-  const queryClient = useQueryClient()
-  // console.log(question)
-  // Queries and mutations
+  // console.log('Rendering')
 
-  const userConfig = useUserConfigQuery()
+  const {
+    register,
+    formState: { errors, isSubmitting },
+    clearErrors,
+    setValue
+  } = useFormContext()
 
-  const [answer, setAnswer] = useState('')
-  const [error, setError] = useState('')
-  const [hello, setHello] = useState(true)
-  const [goodbye, setGoodbye] = useState(true)
+  const answerInput = register('answer', {})
 
-  // Answer a question
-  const handleAnswer = async () => {
-    if (answer && /\S/.test(answer)) {
-      let finalAnswer = answer
-
-      if (hello && userConfig?.data?.data.preAnswerMsg) {
-        finalAnswer = `${userConfig?.data.data.preAnswerMsg} ${answer}`
-      }
-
-      if (goodbye && userConfig?.data?.data.postAnswerMsg) {
-        finalAnswer = `${finalAnswer} ${userConfig?.data.data.postAnswerMsg}`
-      }
-
-      // console.log(finalAnswer);
-      answerQuestion({
-        id: questionId,
-        answer: finalAnswer
-      } as unknown as void)
-
-      if (true) {
-        return queryClient.invalidateQueries('questions')
-      } else {
-        setError('Ups ocurrio algo inesperado, espera un rato y si no funciona llama a Fran')
-        setTimeout(() => setError(''), 8000)
-        return
-      }
-    } else {
-      setAnswer('')
-      setError('No podes enviar una respuesta vacia!')
-      setTimeout(() => setError(''), 8000)
-      return
-    }
-  }
-
-  // State and queries for Listings and Quick Answers autocomplete
+  const mergedRef = mergeRefs(textareaRef, answerInput.ref)
 
   interface AutocompleteState {
+    value: string
     query: string
-    results: any
+    results: MeliItem[] | QuickAnswer[]
+    type: 'item' | 'answer' | ''
+    loading: boolean
   }
   const [autocomplete, setAutocomplete] = useSetState<AutocompleteState>({
+    value: '',
     query: '',
-    results: []
+    results: [],
+    type: '',
+    loading: true
   })
 
-  const [shouldOpen, setShouldOpen] = useState(false)
+  const hotkeyHandler = getHotkeyHandler([
+    [
+      'mod+enter',
+      (e) => {
+        console.log(autocomplete)
+        if (autocomplete.query || autocomplete.results.length > 0) return
 
-  const [query] = useDebouncedValue(autocomplete.query, 1000)
+        submitBtnRef.current?.click()
+      }
+    ]
+  ])
+
+  const [query] = useDebouncedValue(autocomplete.query, 600, {
+    leading: true
+  })
 
   const MlItemsQuery = useSearchMLItemQuery(query.slice(1), {
     enabled: false
@@ -146,82 +173,84 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
 
   const searchMlItems = MlItemsQuery.refetch
 
-  const QuickAnswersQuery = useSearchQuickAnswersQuery(query.slice(1), {
+  const QuickAnswersQuery = useGetQuickAnswersQuery(query.slice(1), {
     enabled: false
   })
   const searchQuickAnswers = QuickAnswersQuery.refetch
-  
-  const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (shouldOpen) {
-      e.preventDefault()
-    }
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === 'Enter' && !shouldOpen) {
-        // alert('I work_)')
-        // handleAnswer()
-      }
-    }
-  }
 
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  const position = textareaRef.current
+  const { top, height, left } = textareaRef.current
     ? getCaretCoordinates(textareaRef.current, textareaRef.current.selectionEnd)
     : { top: 0, height: 0, left: 0 }
 
-  const insertValue = (value: string) => {
-    // setAnswer(answer.replace(/[@#][^@#\s]*$/, value + ' '))
-    setAutocomplete({ query: '' })
-    textareaRef!.current!.focus()
-  }
-
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value, selectionEnd = 0 } = textareaRef.current!
+    answerInput.onChange(e)
+
+    setAutocomplete({ value: e.target.value })
+    if (!textareaRef.current) return
+
+    const { value, selectionEnd = 0 } = textareaRef.current
     const result = getActiveToken(value, selectionEnd)
 
-    if (!result?.word) return
+    if (!result?.word) return setAutocomplete({ query: '', type: '', results: [] })
 
     const { word } = result
+    if (/^[@#]\w{0,30}$/.test(word)) {
+      const split = word.split('_')
 
-    setShouldOpen(/^[@#]\w{0,30}$/.test(word))
+      const joined = split.join(' ')
 
-    const split = word.split('_')
-
-    const joined = split.join(' ')
-
-    shouldOpen && setAutocomplete({ query: joined.toLowerCase() })
-
-    if (!word) {
-      setAutocomplete({ query: '' })
+      setAutocomplete({ query: joined.toLowerCase() })
     }
-
-    // console.log(e.currentTarget.value)
-
-    // setAnswer(e.currentTarget.value !== '' ? e.currentTarget.value : '')
   }
 
   useEffect(() => {
-    if (query.includes('@')) {
+    if (!textareaRef.current) return
+
+    const { value, selectionEnd } = textareaRef.current
+
+    const result = getActiveToken(value, selectionEnd || 0)
+
+    if (result?.word.includes('@')) {
+      setAutocomplete({ type: 'answer' })
       searchQuickAnswers().then((res) => {
-        setAutocomplete({ results: res?.data?.data.quickAnswers || [] })
+        setAutocomplete(() => ({
+          type: 'answer',
+          results: res?.data?.data.results || [],
+          loading: false
+        }))
       })
-    }
-    if (query.includes('#')) {
+    } else if (result?.word.includes('#')) {
+      setAutocomplete({ type: 'item' })
+
+      if (result.word.length < 4) return
+
       searchMlItems().then((res) => {
-        // console.log(res)
-        setAutocomplete({ results: res?.data?.data.items || [] })
+        setAutocomplete(() => ({
+          type: 'item',
+          results: res?.data?.data.results || [],
+          loading: false
+        }))
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, searchMlItems, searchQuickAnswers])
 
-  // End of autocomplete
   const drop = (e: React.DragEvent<HTMLTextAreaElement>) => {
-    const value = e.dataTransfer.getData('value')
+    if (!textareaRef.current) return
 
-    setAnswer(`${answer}${value.trim()} `)
-    textareaRef.current!.focus()
+    const { value, selectionEnd } = textareaRef.current
+    const data = e.dataTransfer.getData('value')
+    const result = getActiveToken(value, selectionEnd || 0)
+    const replacement = ` ${data}`
+
+    const newValue = replaceAt(value, replacement, result?.range[1]! + 1).trim() + ' '
+
+    setAutocomplete({
+      value: newValue
+    })
+
+    textareaRef.current.selectionEnd = result?.range[1]! + replacement.length
+
+    textareaRef.current.focus()
   }
 
   const dragOver = (e: React.DragEvent<HTMLTextAreaElement>) => {
@@ -231,152 +260,157 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({
 
   return (
     <>
-      <Group align="end" position="apart" mb={0}>
-        {userConfig?.data?.data.preAnswerMsg && (
-          <Checkbox
-            checked={hello}
-            onChange={(e) => setHello(e.target.checked)}
-            label={`${userConfig?.data?.data.preAnswerMsg}`}
-            radius="xs"
-            size="sm"
-            mb="xs"
-          />
-        )}
-        <Text
-          size="xs"
-          sx={{
-            fontStyle: 'italic',
-            marginLeft: 'auto'
-          }}
-        >
-          {upperFirst(getTimeAgo(new Date(dateCreated).getTime()))}
-        </Text>
-      </Group>
-      <Group sx={{ position: 'relative', width: '100%' }} noWrap mb={12}>
+      <Box sx={{ position: 'relative', width: '100%' }} mb={12}>
+        {/* @ts-ignore */}
         <Combobox
-          as="div"
-          style={{ width: '100%' }}
           // @ts-ignore
-          onChange={(value: QuickAnswer | FullMeliItem) => {
-            if ('permalink' in value) {
-              insertValue(value.permalink)
-            } else {
-              insertValue(value.text)
-            }
-            setAutocomplete({ results: [] })
+          onChange={(data) => {
+            if (!textareaRef.current) return
+
+            const { value, selectionEnd } = textareaRef.current
+            const result = getActiveToken(value, selectionEnd || 0)
+            const replacement = `${data} `
+
+            const newValue = replaceAt(value, replacement, result?.range[0]!, result?.word.length)
+
+            setValue('answer', newValue)
+
+            setAutocomplete({
+              query: '',
+              results: [],
+              type: '',
+              value: newValue,
+              loading: true
+            })
+
+            textareaRef.current.selectionEnd = result?.range[0]! + replacement.length
+            textareaRef.current.focus()
           }}
-          value={answer}
+          value={autocomplete.value}
+          disabled={isSubmitting}
         >
-          <Combobox.Input
-            as="textarea"
-            className={classes.comboboxInput}
-            style={{
-              borderColor: error ? theme.colors.red[7] : ''
-            }}
-            id={`answer-textarea`}
-            placeholder="Ingresa tu respuesta"
-            maxLength={2000}
-            onChange={handleInput}
-            ref={textareaRef}
-            onKeyUp={handleKeyUp}
-            onDrop={drop}
-            onDragOver={dragOver}
-          />
-          {shouldOpen && autocomplete.results.length > 0 && (
-            <Combobox.Options
-              static
-              className={classes.comboboxOptions}
-              style={{
-                top: position.top + position.height - 15,
-                left: position.left - 30
+          <Group style={{ width: ' 100%' }}>
+            <Combobox.Input
+              as="textarea"
+              className={cx(classes.comboboxInput, { [classes.textareaError]: errors.answer })}
+              placeholder="Ingresa tu respuesta"
+              maxLength={2000}
+              {...register('answer', {
+                required: {
+                  value: true,
+                  message: 'No podes enviar una respuesta vacia'
+                }
+              })}
+              onChange={handleInput}
+              name={answerInput.name}
+              onBlur={answerInput.onBlur}
+              ref={mergedRef}
+              onDrop={drop}
+              onDragOver={dragOver}
+              onKeyUp={hotkeyHandler}
+            />
+            <button
+              className={cx(classes.comboboxButton, { [classes.buttonError]: errors.answer })}
+              type="submit"
+              ref={submitBtnRef}
+              onClick={() => {
+                setTimeout(() => clearErrors('answer'), 2800)
               }}
             >
-              <Paper
-                component={ScrollArea}
-                shadow="md"
-                radius="xs"
-                offsetScrollbars
-                sx={(theme) => ({
-                  height: 160
-                })}
-              >
-                {autocomplete.results.map((value: QuickAnswer | FullMeliItem) => (
-                  <Combobox.Option
-                    key={'id' in value ? value.id : value._id}
-                    value={value}
-                    as="div"
-                  >
-                  
-                  </Combobox.Option>
-                ))}
-              </Paper>
-            </Combobox.Options>
-          )}
-          {/^[@#]\w{1,30}$/.test(query) && autocomplete.results.length === 0 && (
-            <Combobox.Options
-              static
-              className={classes.comboboxOptions}
-              style={{
-                top: position.top + position.height - 15,
-                left: position.left - 30
-              }}
-            >
-              {MlItemsQuery.isLoading || QuickAnswersQuery.isLoading ? (
-                <Paper p={4} radius="xs">
-                  <Text size="sm">Cargando...</Text>
-                </Paper>
+              {isSubmitting ? (
+                <Loader size={32} color="#ffffff" />
               ) : (
-                <Paper p={4} radius="xs">
-                  <Text size="sm">No se encontraron resultados.</Text>
-                </Paper>
+                <Checks color="white" size={32} />
               )}
-            </Combobox.Options>
-          )}
+            </button>
+
+            <Transition
+              mounted={!!autocomplete.query && autocomplete.results.length > 0}
+              transition="scale-y"
+            >
+              {(styles) => (
+                <Combobox.Options
+                  static
+                  className={classes.comboboxOptions}
+                  style={{
+                    top: `${top + height <= 76 ? top : 76}px`,
+                    left: left - 35,
+                    minWidth: '250px',
+                    zIndex: 1000,
+                    ...styles
+                  }}
+                >
+                  <Paper
+                    component={ScrollArea}
+                    shadow="md"
+                    radius="xs"
+                    scrollbarSize={1}
+                    offsetScrollbars
+                    sx={(theme) => ({
+                      height: autocomplete.results.length * 32,
+                      maxHeight: 160
+                    })}
+                  >
+                    {autocomplete.results.map((value) => {
+                      if (autocomplete.type === 'item') {
+                        return <AutocompleteMeliItem item={value as MeliItem} key={value.id} />
+                      } else {
+                        return (
+                          <AutocompleteQuickAnswerOption
+                            value={value as QuickAnswer}
+                            key={value.id}
+                          />
+                        )
+                      }
+                    })}
+                  </Paper>
+                </Combobox.Options>
+              )}
+            </Transition>
+            <Transition
+              mounted={!!autocomplete.query && autocomplete.results.length === 0}
+              transition="scale-y"
+            >
+              {(styles) => (
+                <Combobox.Options
+                  static
+                  className={classes.comboboxOptions}
+                  style={{
+                    top: `${top + height <= 76 ? top : 76}px`,
+                    left: left - 35,
+                    minWidth: '250px',
+                    zIndex: 1000,
+                    ...styles
+                  }}
+                >
+                  {!autocomplete.loading ? (
+                    <Paper p={4} radius="xs">
+                      <Text size="sm">No se encontraron resultados.</Text>
+                    </Paper>
+                  ) : autocomplete.query.length < 4 && autocomplete.type === 'item' ? (
+                    <Paper p={4} radius="xs">
+                      <Text size="sm">Por favor ingresa al menos 3 letras.</Text>
+                    </Paper>
+                  ) : (
+                    <Paper p={4} radius="xs">
+                      <Center>
+                        <Loader size="xs" />
+                      </Center>
+                    </Paper>
+                  )}
+                </Combobox.Options>
+              )}
+            </Transition>
+          </Group>
         </Combobox>
-
-        <button
-          className={classes.comboboxButton}
-          onClick={handleAnswer}
-          style={{
-            backgroundColor: error ? theme.colors.red[7] : ''
-          }}
-        >
-          <Checks color="white" size={32} />
-        </button>
-      </Group>
-
-      {error ? (
-        <Text size="xs" sx={{ fontStyle: 'italic' }} color="red" mt={0} mb="md">
-          {error}
-        </Text>
-      ) : (
-        <Text
-          sx={(theme) => ({
-            fontStyle: 'italic',
-            color: theme.colors.gray[6]
-          })}
-          size="xs"
-          mt={0}
-          mb="md"
-        >
-          Tipeá &apos;@&apos; para respuestas rápidas o &apos;#&apos; para insertar un link a otra
-          publicación. Usá Ctrl + Enter para enviar la respuesta.
-        </Text>
-      )}
-      {userConfig?.data?.data.postAnswerMsg ? (
-        <Checkbox
-          checked={goodbye}
-          onChange={(e) => setGoodbye(e.target.checked)}
-          radius="xs"
-          size="sm"
-          my="md"
-          label={`${userConfig?.data?.data.postAnswerMsg}`}
-        />
-      ) : (
-        <Text size="xs" sx={{ fontStyle: 'italic' }}>
-          Podes configurar tu saludo y despedida desde opciones.
-        </Text>
-      )}
+        {errors.answer ? (
+          <Text color="red" size="sm" mt="sm">
+            {errors.answer.message}
+          </Text>
+        ) : (
+          ''
+        )}
+      </Box>
     </>
   )
 }

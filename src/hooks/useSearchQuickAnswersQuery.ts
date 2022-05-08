@@ -6,19 +6,19 @@ import { useAxiosInstance } from './useAxios'
 
 export interface QuickAnswersSearchResult {
   query: string
-  quickAnswers: QuickAnswer[]
+  results: QuickAnswer[]
   matches: number
   total: number
 }
 
-export const useSearchQuickAnswersQuery = (
-  query: string,
-  options: UseQueryOptions<AxiosResponse<QuickAnswersSearchResult>, AxiosError>
+export const useGetQuickAnswersQuery = (
+  query?: string,
+  options?: UseQueryOptions<AxiosResponse<QuickAnswersSearchResult>, AxiosError>
 ) => {
   const axiosPrivate = useAxiosInstance()
   return useQuery<AxiosResponse<QuickAnswersSearchResult>, AxiosError>(
-    ['quickanswers-search', query],
-    () => axiosPrivate.get<QuickAnswersSearchResult>(`user/quickanswers?q=${query}`),
+    ['quickanswers-', query],
+    () => axiosPrivate.get<QuickAnswersSearchResult>(`users/quickanswers?q=${query}`),
     {
       ...options
     }

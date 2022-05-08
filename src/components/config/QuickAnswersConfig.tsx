@@ -111,12 +111,11 @@ export function QuickAnswersConfig({ quickAnswers }: QuickAnswersConfigProps) {
                 <Group position="apart" key={answer._id}>
                   <Box
                     sx={{
-                      backgroundColor: answer.color,
                       borderRadius: 2,
                       width: 180
                     }}
                   >
-                    <QuickAnswer {...answer} />
+                    <QuickAnswer {...answer} width={180} />
                   </Box>
 
                   <Text>{answer.text}</Text>

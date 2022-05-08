@@ -9,14 +9,15 @@ import {
   Text,
   Checkbox
 } from '@mantine/core'
-import { yupResolver, useForm } from '@mantine/form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { AxiosError } from 'axios'
 import axios from '../helpers/axios'
 import * as Yup from 'yup'
 import { useAuth } from '../hooks/useAuth'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDocumentTitle } from '@mantine/hooks'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -55,22 +56,37 @@ const useStyles = createStyles((theme) => ({
   }
 }))
 
+interface SignInFormData {
+  email: string
+  password: string
+  persist: boolean
+}
+
 export function SignIn() {
+  useDocumentTitle('Login - El Rio Libros')
   const { classes } = useStyles()
   const { auth, setAuth } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  useDocumentTitle('Login - El Rio Libros')
-  const submit = async (values: typeof form.values) => {
+  console.log(location)
+  const schema = Yup.object({
+    email: Yup.string()
+      .required('Por favor completar!')
+      .email('Por favor ingresar un email valido'),
+    password: Yup.string().required('Por favor completar!')
+  })
+
+  const { register, handleSubmit, setError } = useForm<SignInFormData>({
+    resolver: yupResolver(schema)
+  })
+
+  const onSubmit = async (values: SignInFormData) => {
     try {
-      const response = await axios.post(
-        '/auth/login',
-        {
-          email: values.email,
-          password: values.password
-        },
-        { withCredentials: true }
-      )
+      const response = await axios.post('/auth/signin', {
+        email: values.email,
+        password: values.password
+      })
 
       console.log(response)
 
@@ -88,9 +104,9 @@ export function SignIn() {
         console.log(response)
 
         if (response?.status === 401) {
-          return form.setErrors({
-            email: response?.data?.errors?.email?.msg,
-            password: response?.data?.errors?.password?.msg
+          return setError('email', {
+            type: 'manual',
+            message: 'Invalid email or password'
           })
         }
       }
@@ -102,22 +118,6 @@ export function SignIn() {
     localStorage.setItem('persist', `${auth.persist}`)
   }, [auth.persist])
 
-  const schema = Yup.object({
-    email: Yup.string()
-      .required('Por favor completar!')
-      .email('Por favor ingresar un email valido'),
-    password: Yup.string().required('Por favor completar!')
-  })
-
-  const form = useForm({
-    initialValues: {
-      email: '',
-      password: '',
-      persist: true
-    },
-    schema: yupResolver(schema)
-  })
-
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
@@ -125,13 +125,13 @@ export function SignIn() {
           Bienvenido!
         </Title>
 
-        <form onSubmit={form.onSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
             label="Email"
             placeholder="hola@gmail.com"
             size="md"
             id="email"
-            {...form.getInputProps('email')}
+            {...register('email')}
           />
           <PasswordInput
             label="Contraseña"
@@ -139,14 +139,9 @@ export function SignIn() {
             mt="md"
             size="md"
             id="password"
-            {...form.getInputProps('password')}
+            {...register('password')}
           />
-          <Checkbox
-            label="Recordame"
-            mt="xl"
-            size="md"
-            {...form.getInputProps('persist', { type: 'checkbox' })}
-          />
+          <Checkbox label="Recordame" mt="xl" size="md" {...register('persist')} />
 
           <Button fullWidth mt="xl" size="md" type="submit">
             Conectar
@@ -155,7 +150,7 @@ export function SignIn() {
 
         <Text align="center" mt="md">
           No tenes una cuenta?{' '}
-          <Anchor href="/auth/register" weight={700}>
+          <Anchor component={Link} to="/auth/signup" weight={700} state={location.state}>
             Registrate
           </Anchor>
         </Text>

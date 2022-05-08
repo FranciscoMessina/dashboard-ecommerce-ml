@@ -1,20 +1,13 @@
 import {
-  ActionIcon,
-  Group,
-  Header,
-  Text,
-  useMantineColorScheme,
-  Badge,
-  MediaQuery,
-  Burger,
-  useMantineTheme
+  ActionIcon, Burger, Group,
+  Header, MediaQuery, Text,
+  useMantineColorScheme, useMantineTheme
 } from '@mantine/core'
-import { Link } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 import { MoonStars, Sun } from 'tabler-icons-react'
 import { navbarAtom } from '../atoms/navbarAtom'
-
 import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
+
 
 export function Topbar() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
@@ -22,17 +15,8 @@ export function Topbar() {
 
   const [open, setOpen] = useRecoilState(navbarAtom)
 
-  const { data: questions } = useGetQuestionsQuery({})
+  const { data: questions } = useGetQuestionsQuery()
 
-  // const dispatch = useDispatch()
-
-  // function toggleDispatch() {
-  //   if (open) {
-  //     dispatch(modalClose())
-  //   } else {
-  //     dispatch(modalOpen())
-  //   }
-  // }
 
   return (
     <Header height={60}>
@@ -68,7 +52,7 @@ export function Topbar() {
         </MediaQuery>
 
         <Group sx={{ marginRight: 4 }}>
-          {questions?.data.total! > 0 && (
+          {/* {questions?.data.total! > 0 && (
             <Badge
               component={Link}
               to="questions"
@@ -80,7 +64,7 @@ export function Topbar() {
             >
               Preguntas: {questions?.data.total}
             </Badge>
-          )}
+          )} */}
           <Group position="center">
             <ActionIcon
               onClick={() => toggleColorScheme()}

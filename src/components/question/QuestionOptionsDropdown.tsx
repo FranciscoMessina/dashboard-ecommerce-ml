@@ -5,8 +5,6 @@ import { useNotifications } from '@mantine/notifications'
 import { FC, useCallback } from 'react'
 import { useQueryClient } from 'react-query'
 import { Check, DotsVertical, PlayerPause, PlayerPlay, Trash, X } from 'tabler-icons-react'
-import axios from '../../helpers/axios'
-import { useAuth } from '../../hooks/useAuth'
 import { useAxiosInstance } from '../../hooks/useAxios'
 
 interface QuestionOptionsDropdownProps {
@@ -17,7 +15,6 @@ interface QuestionOptionsDropdownProps {
 }
 
 export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
-  blockUser,
   questionId,
   itemId,
   status
@@ -50,9 +47,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
           disallowClose: true
         })
         try {
-          const response = await axiosPrivate.delete(`/ml/questions?id=${questionId}`)
+          const response = await axiosPrivate.delete(`/meli/questions/${questionId}`)
 
-          if (response.data.status === 'DELETED') {
+          if (response.data[0] === 'Question deleted.') {
             notifications.updateNotification(id, {
               id,
               color: 'teal',
@@ -80,8 +77,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
             color: 'red',
             icon: <X />
           })
+        } finally {
+          await queryClient.invalidateQueries('questions')
         }
-        await queryClient.invalidateQueries('questions')
       }
     })
   }, [questionId, modals, notifications, queryClient])
@@ -108,9 +106,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
           disallowClose: true
         })
         try {
-          const response = await axiosPrivate.put(`/ml/items/${itemId}/pause`)
+          const response = await axiosPrivate.patch(`/meli/items/${itemId}/pause`)
 
-          if (response.data.data.status === 'paused') {
+          if (response.data.status === 'paused') {
             notifications.updateNotification(id, {
               id,
               color: 'teal',
@@ -131,6 +129,7 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
             })
           }
         } catch (err) {
+          console.log(err)
           notifications.updateNotification(id, {
             id,
             title: 'Algo salio mal',
@@ -139,8 +138,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
             color: 'red',
             icon: <X />
           })
+        } finally {
+          await queryClient.invalidateQueries('questions')
         }
-        await queryClient.invalidateQueries('questions')
       }
     })
   }, [itemId, modals, notifications, queryClient])
@@ -165,9 +165,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
           disallowClose: true
         })
         try {
-          const response = await axiosPrivate.put(`/ml/items/${itemId}/activate`)
+          const response = await axiosPrivate.patch(`/meli/items/${itemId}/activate`)
 
-          if (response.data.data.status === 'active') {
+          if (response.data.status === 'active') {
             notifications.updateNotification(id, {
               id,
               color: 'teal',
@@ -188,6 +188,8 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
             })
           }
         } catch (err) {
+          console.log(err)
+
           notifications.updateNotification(id, {
             id,
             title: 'Algo salio mal',
@@ -196,8 +198,9 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
             color: 'red',
             icon: <X />
           })
+        } finally {
+          await queryClient.invalidateQueries('questions')
         }
-        await queryClient.invalidateQueries('questions')
       }
     })
   }, [itemId, modals, notifications, queryClient])
@@ -258,79 +261,3 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
     </Menu>
   )
 }
-// return (
-//   <div className="text-right">
-//     <Menu as="div" className="relative inline-block text-left">
-//       <div>
-//         <Menu.Button className="inline-flex w-full justify-center rounded-md bg-black bg-opacity-0 px-2 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-opacity-10">
-//           <DotsVerticalIcon
-//             className="h-6 w-6 text-black"
-//             aria-hidden="true"
-//           />
-//         </Menu.Button>
-//       </div>
-//       <Transition
-//         as={Fragment}
-//         enter="transition ease-out duration-100"
-//         enterFrom="transform opacity-0 scale-95"
-//         enterTo="transform opacity-100 scale-100"
-//         leave="transition ease-in duration-75"
-//         leaveFrom="transform opacity-100 scale-100"
-//         leaveTo="transform opacity-0 scale-95"
-//       >
-//         <Menu.Items className="absolute right-12 -top-3 z-50 mt-2 flex origin-top-right rounded-sm focus:outline-none">
-//           <div className="flex px-1 py-1">
-//             {status === 'active' ? (
-//               <Menu.Item>
-//                 {({ active }) => (
-//                   <button
-//                     className={`${
-//                       active && 'bg-gray-100 '
-//                     } group flex w-full items-center justify-center rounded-md px-2 py-2 text-sm text-black `}
-//                   >
-//                     <PauseIcon
-//                       className="h-6 w-6"
-//                       aria-hidden="true"
-//                       onClick={pauseItem}
-//                     />
-//                   </button>
-//                 )}
-//               </Menu.Item>
-//             ) : (
-//               <Menu.Item>
-//                 {({ active }) => (
-//                   <button
-//                     className={`${
-//                       active && 'bg-gray-100 '
-//                     } group flex w-full items-center justify-center rounded-md px-2 py-2 text-sm text-black`}
-//                   >
-//                     <PlayIcon
-//                       className="h-6 w-6"
-//                       aria-hidden="true"
-//                       onClick={activateItem}
-//                     />
-//                   </button>
-//                 )}
-//               </Menu.Item>
-//             )}
-//             <Menu.Item>
-//               {({ active }) => (
-//                 <button
-//                   className={`${
-//                     active && 'bg-gray-100 '
-//                   } group flex w-full items-center justify-center rounded-md px-2 py-2 text-sm text-black`}
-//                 >
-//                   <TrashIcon
-//                     className="h-6 w-6"
-//                     aria-hidden="true"
-//                     onClick={() => handleDelete()}
-//                   />
-//                 </button>
-//               )}
-//             </Menu.Item>
-//           </div>
-//         </Menu.Items>
-//       </Transition>
-//     </Menu>
-//   </div>
-// )

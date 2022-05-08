@@ -71,7 +71,7 @@ export default function Sales() {
               />
             </Group>
           </Paper>
-          {ordersQuery.data?.data.orders.map((order: MeliCompleteOrderData) => (
+          {ordersQuery.data?.data.results.map((order: MeliCompleteOrderData) => (
             <OrderDisplay order={order} key={order.id} />
           ))}
         </Group>

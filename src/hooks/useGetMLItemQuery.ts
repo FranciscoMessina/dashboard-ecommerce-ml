@@ -9,8 +9,8 @@ export const useGetMLItemQuery = (
 ) => {
   const axiosPrivate = useAxiosInstance()
   return useQuery<AxiosResponse<MeliItem>, AxiosError>(
-    ['ml-item', itemId],
-    () => axiosPrivate.get<MeliItem>(`ml/items/${itemId}`),
+    ['meli-item', itemId],
+    () => axiosPrivate.get<MeliItem>(`meli/items/${itemId}`),
     {
       ...options
     }

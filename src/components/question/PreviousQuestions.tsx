@@ -1,21 +1,37 @@
-import { Text, Group, Box, Paper, Collapse } from '@mantine/core'
+import { Text, Group, Box, Paper, Collapse, UnstyledButton, Anchor } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { FC } from 'react'
+import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Message, Message2 } from 'tabler-icons-react'
 import { PreviousQuestion } from '../../types/types'
 
 interface PreviousQuestionsProps {
-  questions: PreviousQuestion[]
-  buyer: string
+  questions: {
+    total: number
+    limit: number
+    offset: number
+    results: PreviousQuestion[]
+  }
+  buyer: {
+    id: number
+    nickname: string
+    city: string | null
+  }
+  itemId: string
 }
 
-export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer }) => {
+export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer, itemId }) => {
   const [show, handlers] = useDisclosure(false)
 
   // console.log(questions)
 
   return (
-    <Paper shadow={'md'}>
+    <Paper
+      shadow={'md'}
+      sx={(theme) => ({
+        width: '100%',
+      })}
+    >
       <Group
         mt={8}
         direction="column"
@@ -28,25 +44,26 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
             theme.colorScheme === 'dark' ? theme.colors.gray[9] : theme.colors.gray[3]
         })}
       >
-        <Group
-          onClick={() => handlers.toggle()}
-          sx={{ width: '100%', cursor: 'pointer', userSelect: 'none' }}
-          align="center"
-          position="apart"
-          noWrap
-        >
-          <Group spacing={4}>
-            <Text size="sm">Preguntas anteriores de</Text>
-            <Text size="sm" weight={600}>
-              {buyer}
-            </Text>
-          </Group>
+        <UnstyledButton style={{ width: '100%' }} onClick={() => handlers.toggle()}>
+          <Group
+            sx={{ width: '100%', cursor: 'pointer', userSelect: 'none' }}
+            align="center"
+            position="apart"
+            noWrap
+          >
+            <Group spacing={4}>
+              <Text size="sm">Preguntas anteriores de</Text>
+              <Text size="sm" weight={600}>
+                {buyer.nickname}
+              </Text>
+            </Group>
 
-          {!show ? <ChevronDown /> : <ChevronUp className="h-5 w-5" />}
-        </Group>
+            {!show ? <ChevronDown /> : <ChevronUp className="h-5 w-5" />}
+          </Group>
+        </UnstyledButton>
       </Group>
       <Collapse in={show}>
-        {questions.map((question, index) => (
+        {questions.results.map((question, index) => (
           <Box
             p="xs"
             sx={(theme) => ({
@@ -62,7 +79,8 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
               <Message size={24} style={{ alignSelf: 'flex-start' }} />
               <Text
                 sx={(theme) => ({
-                  flex: ' 1 1 0%'
+                  flex: ' 1 1 0%',
+                  wordBreak: 'break-all'
                 })}
               >
                 {question.text}
@@ -82,11 +100,12 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
                 day: 'numeric'
               })}
             </Text>
-            <Group>
+            <Group align="start">
               <Message2 />
               <Text
                 sx={(theme) => ({
-                  flex: ' 1 1 0%'
+                  flex: ' 1 1 0%',
+                  wordBreak: 'break-word'
                 })}
               >
                 {question.answer.text}
@@ -108,6 +127,22 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
             </Text>
           </Box>
         ))}
+        {questions.total > questions.limit && (
+          <Box
+            p="xs"
+            sx={(theme) => ({
+              border: '1px solid',
+              borderTop: 0,
+              borderColor: theme.colors.blue[7],
+              backgroundColor:
+                theme.colorScheme === 'dark' ? theme.colors.gray[9] : theme.colors.gray[3]
+            })}
+          >
+            <Anchor component={Link} to={`/questions/history?from=${buyer.id}&item=${itemId}`}>
+              Ver mas preguntas
+            </Anchor>
+          </Box>
+        )}
       </Collapse>
     </Paper>
   )

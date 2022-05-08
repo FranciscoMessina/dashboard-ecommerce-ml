@@ -1,29 +1,35 @@
-import { Route, Routes } from 'react-router-dom'
-import { Layout } from './components/Layout'
-import { SignIn } from './pages/SignIn'
-import { SignUp } from './pages/SignUp'
-import { Home } from './pages/Home'
-import { Center, ColorScheme, ColorSchemeProvider, Loader, MantineProvider } from '@mantine/core'
+import {
+  Center,
+  ColorScheme,
+  ColorSchemeProvider,
+  Global,
+  Loader,
+  MantineProvider
+} from '@mantine/core'
+import { useLocalStorage } from '@mantine/hooks'
 import { ModalsProvider } from '@mantine/modals'
 import { NotificationsProvider } from '@mantine/notifications'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { AddPostAnswerModal } from './components/modals/AddPostAnswerModal'
-import { AddPreAnswerModal } from './components/modals/AddPreAnswerModal'
-import { AddQuickAnswerModal } from './components/modals/AddQuickAnswerModal'
-import { EditPostAnswerModal } from './components/modals/EditPostAnswerModal'
-import { EditPreAnswerModal } from './components/modals/EditPreAnswerModal'
-import { EditQuickAnswerModal } from './components/modals/EditQuickAnswerModal'
-import { useLocalStorage } from '@mantine/hooks'
+import React, { useEffect } from 'react'
+import { useQueryClient } from 'react-query'
+import { Route, Routes } from 'react-router-dom'
+import { useRecoilValue } from 'recoil'
+import { authAtom } from './atoms/authAtom.js'
 import { PersistLogin } from './components/auth/PersistLogin'
-import Unauthorized from './components/auth/Unauthorized'
-import { Missing } from './pages/Missing'
-import React from 'react'
 import { RequireAuth } from './components/auth/RequireAuth'
+import Unauthorized from './components/auth/Unauthorized'
+import { Layout } from './components/Layout'
+import { Home } from './pages/Home'
+import { SignIn } from './pages/SignIn'
+import { SignUp } from './pages/SignUp'
+import './styles/global.css'
 
 const Questions = React.lazy(() => import('./pages/Questions'))
+const QuestionsHistory = React.lazy(() => import('./pages/QuestionsHistory'))
 const Sales = React.lazy(() => import('./pages/Sales'))
 const Settings = React.lazy(() => import('./pages/Settings'))
 const Publicator = React.lazy(() => import('./pages/Publicator'))
+const MeliCallback = React.lazy(() => import('./pages/MeliCallback'))
+const MeliLink = React.lazy(() => import('./pages/MeliLink'))
 
 const ROLES = {
   User: 2001,
@@ -36,116 +42,193 @@ function App() {
     key: 'color-scheme',
     defaultValue: 'light'
   })
+  const auth = useRecoilValue(authAtom)
+  const queryClient = useQueryClient()
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: 2,
-        staleTime: 1000 * 20
+  useEffect(() => {
+    if (auth.user) {
+      const source = new EventSource(
+        `${import.meta.env.VITE_API_URL}meli/updates?id=${auth.user}`,
+        {
+          withCredentials: true
+        }
+      )
+
+      source.onopen = () => {
+        console.log('Connected to events')
+      }
+
+      source.onmessage = (ev) => {
+        console.log(JSON.parse(ev.data))
+
+        // TODO: Test different accounts receiving events.
+
+        const notification = JSON.parse(ev.data)
+
+        if (notification.topic === 'questions') {
+          setTimeout(
+            () =>
+              queryClient.refetchQueries(['questions'], {
+                active: true
+              }),
+            500
+          )
+        }
       }
     }
-  })
+  }, [auth])
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme((curr) => (curr === 'dark' ? 'light' : 'dark'))
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <MantineProvider theme={{ colorScheme }} withNormalizeCSS withGlobalStyles>
-          <NotificationsProvider>
-            <ModalsProvider
-              modals={{
-                addQuickAnswer: AddQuickAnswerModal,
-                editQuickAnswer: EditQuickAnswerModal,
-                addPreAnswer: AddPreAnswerModal,
-                editPreAnswer: EditPreAnswerModal,
-                addPostAnswer: AddPostAnswerModal,
-                editPostAnswer: EditPostAnswerModal
-              }}
-            >
-              <Routes>
+    <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+      <MantineProvider theme={{ colorScheme }} withNormalizeCSS withGlobalStyles>
+        <NotificationsProvider>
+          <ModalsProvider>
+            <Routes>
+              <Route element={<PersistLogin />}>
                 {/* Public routes */}
-                <Route path="auth/login" element={<SignIn />} />
-                <Route path="auth/register" element={<SignUp />} />
+                <Route path="auth/signin" element={<SignIn />} />
+                <Route path="auth/signup" element={<SignUp />} />
                 <Route path="auth/unauthorized" element={<Unauthorized />} />
-                  {/* Protected Routes */}
 
-                <Route path="/" element={<Layout />}>
-                  <Route element={<PersistLogin />}>
-                    <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
-                      <Route path="/" element={<Home />} />
-
-                      <Route
-                        path="questions"
-                        element={
-                          <React.Suspense
-                            fallback={
-                              <Center>
-                                <Loader />
-                              </Center>
-                            }
-                          >
-                            <Questions />
-                          </React.Suspense>
+                <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+                  <Route
+                    path="auth/link-meli"
+                    element={
+                      <React.Suspense
+                        fallback={
+                          <Center>
+                            <Loader />
+                          </Center>
                         }
-                      />
-
-                      <Route
-                        path="sales"
-                        element={
-                          <React.Suspense
-                            fallback={
-                              <Center>
-                                <Loader />
-                              </Center>
-                            }
-                          >
-                            <Sales />
-                          </React.Suspense>
+                      >
+                        <MeliLink />
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="auth/callback"
+                    element={
+                      <React.Suspense
+                        fallback={
+                          <Center>
+                            <Loader />
+                          </Center>
                         }
-                      />
-
-                      <Route
-                        path="settings"
-                        element={
-                          <React.Suspense
-                            fallback={
-                              <Center>
-                                <Loader />
-                              </Center>
-                            }
-                          >
-                            <Settings />
-                          </React.Suspense>
-                        }
-                      />
-
-                      <Route
-                        path="publish"
-                        element={
-                          <React.Suspense
-                            fallback={
-                              <Center>
-                                <Loader />
-                              </Center>
-                            }
-                          >
-                            <Publicator />
-                          </React.Suspense>
-                        }
-                      />
-                    </Route>
-                  </Route>
+                      >
+                        <MeliCallback />
+                      </React.Suspense>
+                    }
+                  />
                 </Route>
 
-                <Route path="*" element={<Missing />} />
-              </Routes>
-            </ModalsProvider>
-          </NotificationsProvider>
-        </MantineProvider>
-      </ColorSchemeProvider>
-    </QueryClientProvider>
+                {/* Protected Routes */}
+
+                <Route path="/" element={<Layout />}>
+                  <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+                    <Route path="/" element={<Home />} />
+
+                    <Route
+                      path="questions"
+                      element={
+                        <React.Suspense
+                          fallback={
+                            <Center>
+                              <Loader />
+                            </Center>
+                          }
+                        >
+                          <Questions />
+                        </React.Suspense>
+                      }
+                    />
+
+                    <Route
+                      path="questions/history"
+                      element={
+                        <React.Suspense
+                          fallback={
+                            <Center>
+                              <Loader />
+                            </Center>
+                          }
+                        >
+                          <QuestionsHistory />
+                        </React.Suspense>
+                      }
+                    />
+
+                    <Route
+                      path="sales"
+                      element={
+                        <React.Suspense
+                          fallback={
+                            <Center>
+                              <Loader />
+                            </Center>
+                          }
+                        >
+                          <Sales />
+                        </React.Suspense>
+                      }
+                    />
+
+                    <Route
+                      path="settings"
+                      element={
+                        <React.Suspense
+                          fallback={
+                            <Center>
+                              <Loader />
+                            </Center>
+                          }
+                        >
+                          <Settings />
+                        </React.Suspense>
+                      }
+                    />
+
+                    <Route
+                      path="publish"
+                      element={
+                        <React.Suspense
+                          fallback={
+                            <Center>
+                              <Loader />
+                            </Center>
+                          }
+                        >
+                          <Publicator />
+                        </React.Suspense>
+                      }
+                    />
+                  </Route>
+                </Route>
+              </Route>
+            </Routes>
+            <Global
+              styles={(theme) => ({
+                '::-webkit-scrollbar': {
+                  width: '6px'
+                },
+                '::-webkit-scrollbar-track': {
+                  background: 'transparent'
+                },
+                '::-webkit-scrollbar-thumb ': {
+                  background: '#888',
+                  borderRadius: '10px'
+                },
+                '::-webkit-scrollbar-thumb:hover': {
+                  background: '#555'
+                }
+              })}
+            />
+          </ModalsProvider>
+        </NotificationsProvider>
+      </MantineProvider>
+    </ColorSchemeProvider>
   )
 }
 

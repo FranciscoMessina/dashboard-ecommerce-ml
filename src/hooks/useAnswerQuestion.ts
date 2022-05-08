@@ -7,7 +7,7 @@ export const useAnswerQuestion = (options: UseMutationOptions) => {
   const axiosPrivate = useAxiosInstance()
 
   return useMutation(
-    (data: any) => axiosPrivate.post('ml/answer', { answer: data.answer, id: data.id }),
+    (data: any) => axiosPrivate.post('meli/answers', { answer: data.answer, id: data.id }),
     {
       onMutate: (data: any) => {
         queryClient.invalidateQueries('questions')

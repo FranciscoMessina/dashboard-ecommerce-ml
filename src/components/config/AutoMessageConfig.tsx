@@ -9,35 +9,40 @@ import {
   Title,
   Tooltip
 } from '@mantine/core'
-import { useForm } from '@mantine/form'
 import { useBooleanToggle } from '@mantine/hooks'
+import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import { InfoCircle } from 'tabler-icons-react'
 import { useAxiosInstance } from '../../hooks/useAxios'
 
 interface AutoMessageConfigProps {
-  saleMsg: {
+  autoMessage: {
     enabled?: boolean
-    text?: string
+    message?: string
   }
 }
 
-export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
+interface AutoMessageFormData {
+  message: string
+  enabled: boolean
+}
+
+export function AutoMessageConfig({ autoMessage }: AutoMessageConfigProps) {
   const [edit, toggleEdit] = useBooleanToggle(false)
   const axios = useAxiosInstance()
   const queryClient = useQueryClient()
 
-  const form = useForm({
-    initialValues: {
-      message: saleMsg?.text || '',
-      enabled: saleMsg?.enabled || ''
+  const { register, handleSubmit, reset } = useForm<AutoMessageFormData>({
+    defaultValues: {
+      message: autoMessage.message || '',
+      enabled: autoMessage.enabled || false
     }
   })
 
-  const handleSubmit = async (values: typeof form.values) => {
+  const onSubmit = async (values: AutoMessageFormData) => {
     toggleEdit()
 
-    await axios.put('/user/salemsg', {
+    await axios.put('/users/automessages', {
       message: values.message,
       enabled: values.enabled
     })
@@ -53,7 +58,7 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
         width: '100%'
       })}
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Group position="apart" mb="md">
           <Group direction="column" spacing={0}>
             <Title order={3}>Mensaje automatico:</Title>
@@ -65,7 +70,7 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
                 position="top"
                 placement="end"
                 withArrow
-                label="Podes usar %FIRST_NAME% y %NICKNAME% y seran remplazados por los datos del cliente"
+                label="Podes usar @NOMBRE y @USUARIO, seran remplazados por los datos del cliente"
               >
                 <Center>
                   <InfoCircle size={18} />
@@ -79,7 +84,7 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
           </Group>
 
           <Group>
-            {saleMsg?.text ? (
+            {autoMessage?.message ? (
               <>
                 {edit ? (
                   <>
@@ -93,7 +98,7 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
                       type="button"
                       onClick={() => {
                         toggleEdit()
-                        form.reset()
+                        reset()
                       }}
                     >
                       Cancelar
@@ -115,14 +120,14 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
             )}
           </Group>
         </Group>
-        {saleMsg?.text && (
+        {autoMessage?.message && (
           <Textarea
             autosize
             minRows={4}
             maxRows={10}
             readOnly={!edit}
             maxLength={2000}
-            {...form.getInputProps('message')}
+            {...register('message')}
           ></Textarea>
         )}
 
@@ -130,7 +135,7 @@ export function AutoMessageConfig({ saleMsg }: AutoMessageConfigProps) {
           mt="md"
           label="Define si se envia el mensaje o no"
           disabled={!edit}
-          {...form.getInputProps('enabled', { type: 'checkbox' })}
+          {...register('enabled')}
         />
       </form>
     </Paper>

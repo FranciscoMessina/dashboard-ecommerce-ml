@@ -4,13 +4,14 @@ import { MeliQuestionsResponse } from '../types/types'
 import { useAxiosInstance } from './useAxios'
 
 export const useGetQuestionsQuery = (
+  offset: number = 0,
   options?: UseQueryOptions<AxiosResponse<MeliQuestionsResponse>, AxiosError>
 ) => {
   const axiosPrivate = useAxiosInstance()
 
   return useQuery<AxiosResponse<MeliQuestionsResponse>, AxiosError>(
-    'questions',
-    () => axiosPrivate.get<MeliQuestionsResponse>(`/ml/questions`),
+    ['questions', offset],
+    () => axiosPrivate.get<MeliQuestionsResponse>(`/meli/questions?offset=${offset}`),
     {
       ...options
     }

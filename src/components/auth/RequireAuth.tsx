@@ -14,6 +14,6 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ allowedRoles }) => {
   ) : auth?.accessToken ? ( //changed from user to accessToken to persist login after refresh
     <Navigate to="/auth/unauthorized" state={{ from: location }} replace />
   ) : (
-    <Navigate to="/auth/login" state={{ from: location }} replace />
+    <Navigate to="/auth/signin" state={{ from: location }} replace />
   )
 }

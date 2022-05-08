@@ -25,8 +25,8 @@ export const EditPreAnswerModal = ({ context, id, innerProps }: ContextModalProp
   const handleSubmit = async (values: typeof form.values) => {
     if (values.message === initialValues.message) return context.closeModal(id)
 
-    await axios.put('/user/preanswer', {
-      message: values.message
+    await axios.post('/users/hello', {
+      hello: values.message
     })
 
     await queryClient.invalidateQueries('user-config')

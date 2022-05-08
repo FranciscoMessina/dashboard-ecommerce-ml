@@ -1,30 +1,32 @@
 import {
+  ActionIcon,
   createStyles,
   Group,
+  GroupedTransition,
+  Indicator,
   Navbar,
   Overlay,
   Tooltip,
-  Transition,
-  UnstyledButton,
   useMantineTheme
 } from '@mantine/core'
-import { useClickOutside, useViewportSize } from '@mantine/hooks'
+import { useViewportSize } from '@mantine/hooks'
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { NavLink } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
 import {
   Box,
   Home2,
   Icon as TablerIcon,
-  Login,
   Logout,
+  Message2Code,
   Plus,
   QuestionMark,
   Settings
 } from 'tabler-icons-react'
-import { authAtom } from '../atoms/authAtom'
 import { navbarAtom } from '../atoms/navbarAtom'
 import { useAuth } from '../hooks/useAuth'
+import { useAxiosInstance } from '../hooks/useAxios'
+import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery.js'
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -58,10 +60,34 @@ interface NavbarLinkProps {
 
   onClick?(): void
   route: string
+  indicator?: number
 }
 
-function NavbarLink({ icon: Icon, label, onClick, route }: NavbarLinkProps) {
+function NavbarLink({ icon: Icon, label, onClick, route, indicator }: NavbarLinkProps) {
   const { classes, cx } = useStyles()
+
+  if (indicator) {
+    return (
+      <Tooltip
+        label={label}
+        position="right"
+        withArrow
+        transitionDuration={0}
+        sx={{ position: 'relative' }}
+      >
+        <NavLink
+          to={route}
+          onClick={onClick}
+          className={({ isActive }) => cx(classes.link, { [classes.active]: isActive })}
+        >
+          <Indicator label={indicator} size={16} radius='sm' position='bottom-center'>
+            <Icon />
+          </Indicator>
+        </NavLink>
+      </Tooltip>
+    )
+  }
+
   return (
     <Tooltip
       label={label}
@@ -81,9 +107,34 @@ function NavbarLink({ icon: Icon, label, onClick, route }: NavbarLinkProps) {
   )
 }
 
+interface NavbarIconProps {
+  icon: TablerIcon
+  label: string
+  onClick?(): void
+}
+
+function NavbarIcon({ icon: Icon, label, onClick }: NavbarIconProps) {
+  const { classes, cx } = useStyles()
+  return (
+    <Tooltip
+      label={label}
+      position="right"
+      withArrow
+      transitionDuration={0}
+      sx={{ position: 'relative' }}
+    >
+      <ActionIcon onClick={onClick} className={classes.link}>
+        <Icon />
+      </ActionIcon>
+    </Tooltip>
+  )
+}
+
 export function Sidebar() {
   const [open, setOpen] = useRecoilState(navbarAtom)
+  const axios = useAxiosInstance()
 
+  const { data: questions } = useGetQuestionsQuery()
 
   const theme = useMantineTheme()
   const navLinks = [
@@ -91,35 +142,47 @@ export function Sidebar() {
     {
       icon: QuestionMark,
       label: 'Preguntas',
-      route: '/questions'
+      route: '/questions',
+      indicator: questions?.data?.total! > 0 ? questions?.data.total : undefined
     },
     { icon: Box, label: 'Ventas', route: '/sales' },
-    { icon: Plus, label: 'Publicar', route: '/publish' }
+    { icon: Plus, label: 'Publicar', route: '/publish' },
+    { icon: Message2Code, label: 'Mensaje Automatico', route: '/settings' }
   ]
 
   const { width } = useViewportSize()
 
   const alwaysShow = width > theme.breakpoints.sm
 
-  const { auth } = useAuth()
+  const { auth, setAuth } = useAuth()
 
   const links = navLinks.map((link, index) => <NavbarLink {...link} key={link.label} />)
 
+  const logout = async () => {
+    try {
+      await axios.post('auth/signout')
+      setAuth({
+        accessToken: null,
+        persist: false,
+        roles: [],
+        user: null
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   return (
-    <Transition
+    <GroupedTransition
       mounted={!open || alwaysShow}
-      transition="pop-top-left"
-      duration={400}
-      timingFunction="ease"
+      transitions={{
+        sidebar: { duration: 400, transition: 'scale-y' },
+        overlay: { duration: 300, transition: 'pop', timingFunction: 'ease' }
+      }}
     >
       {(styles) => (
         <>
-          <Navbar
-            width={{ base: 60 }}
-            hidden={open}
-            hiddenBreakpoint="sm"
-            style={styles}
-          >
+          <Navbar width={{ base: 60 }} hidden={open} hiddenBreakpoint="sm" style={styles.sidebar}>
             <Navbar.Section grow mt={20}>
               <Group direction="column" align="center" spacing={2}>
                 {links}
@@ -127,20 +190,16 @@ export function Sidebar() {
             </Navbar.Section>
             <Navbar.Section mb={10}>
               <Group direction="column" align="center" spacing={1}>
-                <NavbarLink icon={Settings} label="Settings" route="/settings" />
+                <NavbarLink icon={Settings} label="Configuración" route="/settings" />
 
-                {auth.user ? (
-                  <NavbarLink icon={Logout} label="Logout" route="/logout" />
-                ) : (
-                  <NavbarLink icon={Login} label="Login" route="/logout" />
-                )}
+                <NavbarIcon icon={Logout} label="Deconectate" onClick={logout} />
               </Group>
             </Navbar.Section>
           </Navbar>
           {!alwaysShow && (
             <Overlay
-              style={styles}
-              zIndex={10}
+              style={styles.overlay}
+              zIndex={99}
               blur={1}
               color={theme.colorScheme === 'dark' ? '#000' : '#fff'}
               onClick={() => setOpen(true)}
@@ -148,6 +207,6 @@ export function Sidebar() {
           )}
         </>
       )}
-    </Transition>
+    </GroupedTransition>
   )
 }

@@ -1,33 +1,19 @@
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string
-      accessToken: string
-    }
-  }
-
-  interface User {
-    id: string
-    accessToken: string
-  }
-}
-
 export interface QuickAnswer {
   [key: string]: any
-  _id: string
+  id: string
   name: string
   text: string
   color: string
 }
 
 export interface UserConfig {
-  uuid: string
-  saleMsg?: {
+  id: string
+  autoMessage?: {
     enabled: boolean
     text: string
   }
-  preAnswerMsg?: string
-  postAnswerMsg?: string
+  hello?: string
+  signature?: string
   quickAnswers?: QuickAnswer[]
 }
 
@@ -51,7 +37,12 @@ export interface MeliQuestionData {
     city: string | null
   }
   item: MeliItem
-  previous: PreviousQuestion[]
+  previous: {
+    total: number
+    limit: number
+    offset: number
+    results: PreviousQuestion[]
+  }
 }
 
 export interface PreviousQuestion {
@@ -364,7 +355,9 @@ export interface MeliNotification {
 export interface MeliQuestionsResponse {
   total: number
   limit: number
-  questions: MeliQuestionData[]
+  offset: number
+  next: string
+  results: MeliQuestionData[]
 }
 
 export interface MeliUserData {
@@ -425,9 +418,15 @@ export interface MeliOrdersResponse {
 }
 
 export interface ApiOrdersResponse {
-  orders: MeliCompleteOrderData[]
+  paging: Paging
+  results: MeliCompleteOrderData[]
 }
 
+export interface Paging {
+  total: number
+  offset: number
+  limit: number
+}
 export interface MeliSimpleOrderData {
   seller: {
     nickname: string

@@ -25,8 +25,8 @@ export const EditPostAnswerModal = ({ context, id, innerProps }: ContextModalPro
   const handleSubmit = async (values: typeof form.values) => {
     if (values.message === initialValues.message) return context.closeModal(id)
 
-    await axios.put('/user/postanswer', {
-      message: values.message
+    await axios.post('/users/signature', {
+      signature: values.message
     })
 
     await queryClient.invalidateQueries('user-config')

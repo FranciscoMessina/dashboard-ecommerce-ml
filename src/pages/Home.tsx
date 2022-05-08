@@ -48,36 +48,10 @@ export function Home() {
       <Center>
         <Group direction="column" align="center">
           <StatsGroup data={data} />
-          <Group position="apart" sx={{ width: '100%' }} grow noWrap>
-            <StatsRingCard {...data2} />
-            <StatsRingCard {...data2} />
-            <StatsRingCard {...data2} />
-          </Group>
 
-          {true ? (
-            <Button
-              component="a"
-              size="xl"
-              href={`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${
-                import.meta.env.VITE_ML_CLIENT_ID
-              }&state=${true}&redirect_uri=${import.meta.env.VITE_API_URL_HTTPS}ml`}
-              target="_blank"
-              rel="noreferrer"
-              leftIcon={<MercadoLibreIcon />}
-              style={{
-                backgroundColor: theme.colors.yellow[5],
-                color: theme.black
-              }}
-            >
-              Link a Mercado Libre
-            </Button>
-          ) : (
-            <Button component="a" variant="gradient" size="xl">
-              Login
-            </Button>
-          )}
-          {/* {status !== 'loading' && JSON.stringify(session, null, 2)}
-              {status} */}
+          <StatsRingCard {...data2} />
+          <StatsRingCard {...data2} />
+          <StatsRingCard {...data2} />
         </Group>
       </Center>
     </Container>

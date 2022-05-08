@@ -1,28 +1,22 @@
 import { Button, Space, Textarea } from '@mantine/core'
-import { useForm, yupResolver } from '@mantine/form'
 import { ContextModalProps } from '@mantine/modals'
+import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import * as Yup from 'yup'
 import { useAxiosInstance } from '../../hooks/useAxios'
+
+interface AnswerMsgFormData {
+  message: string
+}
 
 export const AddPreAnswerModal = ({ context, id, innerProps }: ContextModalProps<any>) => {
   const queryClient = useQueryClient()
   const axios = useAxiosInstance()
 
-  const formSchema = Yup.object({
-    message: Yup.string().required('El mensaje es requerido')
-  })
-
-  const form = useForm({
-    initialValues: {
-      message: ''
-    },
-    schema: yupResolver(formSchema)
-  })
-
-  const handleSubmit = async (values: typeof form.values) => {
-    const res = await axios.post('/user/preanswer', {
-      message: values.message
+  const { register, handleSubmit } = useForm<AnswerMsgFormData>()
+  const onSubmit = async (values: AnswerMsgFormData) => {
+    const res = await axios.post('/users/hello', {
+      hello: values.message
     })
 
     console.log(res)
@@ -31,8 +25,8 @@ export const AddPreAnswerModal = ({ context, id, innerProps }: ContextModalProps
     context.closeModal(id)
   }
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
-      <Textarea required label="Texto" {...form.getInputProps('message')}></Textarea>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Textarea required label="Texto" {...register('message')}></Textarea>
       <Space my={12} />
 
       <Button fullWidth mt={10} type="submit" color="teal">
