@@ -1,9 +1,7 @@
-import { Container, Center, Group, Button, useMantineTheme } from '@mantine/core'
-import { StatsGroup } from '../components/OrderStats'
-import { MercadoLibreIcon } from '../components/SocialIcons/MercadoLibreIcon'
-import { StatsRingCard } from '../components/StatsCard'
-import { Layout } from '../components/Layout'
+import { Center, Container, Group, useMantineTheme } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
+import { StatsGroup } from '../components/OrderStats'
+import { StatsRingCard } from '../components/StatsCard'
 
 const data = [
   {

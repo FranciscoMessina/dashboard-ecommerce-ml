@@ -20,7 +20,7 @@ export default function MeliLink() {
             size="xl"
             href={`https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${
               import.meta.env.VITE_ML_CLIENT_ID
-            }&state=${auth.user}&redirect_uri=${import.meta.env.VITE_API_MELI_REDIRECT_URL}`}
+            }&state=${auth.userId}&redirect_uri=${import.meta.env.VITE_API_MELI_REDIRECT_URL}`}
             leftIcon={<MercadoLibreIcon />}
             style={{
               backgroundColor: theme.colors.yellow[5],

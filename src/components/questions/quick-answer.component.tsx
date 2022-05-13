@@ -7,10 +7,11 @@ interface QuickAnswerProps {
   id: string
   color: string
   draggable?: boolean
-  width?: number
+  width?: number | string
+  height?: number | string
 }
 
-function QuickAnswer({ text, name, id, color, draggable, width }: QuickAnswerProps) {
+function QuickAnswer({ text, name, id, color, draggable, width, height }: QuickAnswerProps) {
   const dragStart: DragEventHandler<HTMLDivElement> = (e) => {
     const target = e.target
 
@@ -32,6 +33,7 @@ function QuickAnswer({ text, name, id, color, draggable, width }: QuickAnswerPro
       style={{
         backgroundColor: color,
         width: width ? `${width}` : `220px`,
+        height: height ? `${height}` : '28px',
         textTransform: 'uppercase',
         cursor: draggable ? 'pointer' : 'default'
       }}

@@ -7,7 +7,9 @@ import {
   Button,
   Anchor,
   Text,
-  Checkbox
+  Checkbox,
+  Alert,
+  List
 } from '@mantine/core'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { AxiosError } from 'axios'
@@ -16,8 +18,9 @@ import * as Yup from 'yup'
 import { useAuth } from '../hooks/useAuth'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDocumentTitle } from '@mantine/hooks'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { AlertCircle, ExclamationMark } from 'tabler-icons-react'
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -69,6 +72,8 @@ export function SignIn() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const [errors, setErrors] = useState<string[]>([])
+
   console.log(location)
   const schema = Yup.object({
     email: Yup.string()
@@ -77,7 +82,7 @@ export function SignIn() {
     password: Yup.string().required('Por favor completar!')
   })
 
-  const { register, handleSubmit, setError } = useForm<SignInFormData>({
+  const { register, handleSubmit, formState } = useForm<SignInFormData>({
     resolver: yupResolver(schema)
   })
 
@@ -93,8 +98,9 @@ export function SignIn() {
       setAuth({
         accessToken: response.data.accessToken as string,
         persist: values.persist,
-        user: response.data.id,
-        roles: response.data.roles
+        userId: response.data.id,
+        roles: response.data.roles,
+        meliId: response.data.meliId
       })
 
       navigate('/')
@@ -104,10 +110,7 @@ export function SignIn() {
         console.log(response)
 
         if (response?.status === 401) {
-          return setError('email', {
-            type: 'manual',
-            message: 'Invalid email or password'
-          })
+          return setErrors(['Email o contraseña incorrectos'])
         }
       }
       console.log(err.toJSON())
@@ -124,6 +127,15 @@ export function SignIn() {
         <Title order={2} className={classes.title} align="center" mt="md" mb={50}>
           Bienvenido!
         </Title>
+        {errors.length > 0 && (
+          <Alert icon={<AlertCircle size={18} />} title="Errores" color="red" mb={20}>
+            {errors.map((error, index) => (
+              <Text key={index} inline>
+                {error}
+              </Text>
+            ))}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
@@ -132,6 +144,7 @@ export function SignIn() {
             size="md"
             id="email"
             {...register('email')}
+            error={formState.errors.email?.message}
           />
           <PasswordInput
             label="Contraseña"
@@ -140,6 +153,7 @@ export function SignIn() {
             size="md"
             id="password"
             {...register('password')}
+            error={formState.errors.password?.message}
           />
           <Checkbox label="Recordame" mt="xl" size="md" {...register('persist')} />
 

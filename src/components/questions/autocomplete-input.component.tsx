@@ -19,7 +19,7 @@ import { getActiveToken } from '../../helpers'
 import { replaceAt } from '../../helpers/replaceAt.js'
 import { useAxiosInstance } from '../../hooks/useAxios.js'
 import { useSearchMLItemQuery } from '../../hooks/useSearchMLItemsQuery'
-import { useGetQuickAnswersQuery } from '../../hooks/useSearchQuickAnswersQuery'
+import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery'
 import { MeliItem, QuickAnswer } from '../../types/types'
 import { AutocompleteMeliItem } from './AutocompleteMeliItem.js'
 import { AutocompleteQuickAnswerOption } from './AutocompleteQuickAnswerOption.js'
@@ -258,6 +258,11 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
     e.stopPropagation()
   }
 
+  const resultBoxHeight =
+    autocomplete.type === 'item'
+      ? autocomplete.results.length * 55
+      : autocomplete.results.length * 35
+
   return (
     <>
       <Box sx={{ position: 'relative', width: '100%' }} mb={12}>
@@ -347,7 +352,7 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
                     scrollbarSize={1}
                     offsetScrollbars
                     sx={(theme) => ({
-                      height: autocomplete.results.length * 32,
+                      height: resultBoxHeight,
                       maxHeight: 160
                     })}
                   >

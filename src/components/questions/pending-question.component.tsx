@@ -20,9 +20,9 @@ import { getTimeAgo, sleep } from '../../helpers'
 import { useAxiosInstance } from '../../hooks/useAxios.js'
 import { useUserConfigQuery } from '../../hooks/useUserConfigQuery'
 import { MeliQuestionData } from '../../types/types'
-import InputWithAutocomplete from './InputWithAutocomplete.js'
-import PreviousQuestions from './PreviousQuestions'
-import { QuestionOptionsDropdown } from './QuestionOptionsDropdown'
+import InputWithAutocomplete from './autocomplete-input.component'
+import PreviousQuestions from './previous-questions.component'
+import { QuestionOptionsDropdown } from './question-options.component'
 
 interface QuestionProps {
   question: MeliQuestionData
@@ -34,9 +34,9 @@ export const PendingQuestion: React.FC<QuestionProps> = ({ question, ...rest }) 
 
   const methods = useForm({
     defaultValues: {
-      hello: true,
+      hello: userConfig.data?.data.hello ? true : false,
       answer: '',
-      signature: true,
+      signature: userConfig.data?.data.signature ? true : false,
       questionId: question.id
     }
   })
@@ -49,11 +49,11 @@ export const PendingQuestion: React.FC<QuestionProps> = ({ question, ...rest }) 
     console.log(data)
     // await sleep(2000)
 
-    const finalAnswer = `${data.hello ? userConfig.data?.data.hello : ''} ${data.answer} ${
-      data.signature ? userConfig.data?.data.signature : ''
+    const finalAnswer = `${data.hello ? `${userConfig.data?.data.hello} ` : ''}${data.answer}${
+      data.signature ? ` ${userConfig.data?.data.signature}` : ''
     }`
 
-    console.log({ finalAnswer })
+    return console.log({ finalAnswer })
 
     try {
       const response = await axios.post('meli/answers', {

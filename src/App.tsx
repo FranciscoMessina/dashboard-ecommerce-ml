@@ -9,7 +9,7 @@ import {
 import { useLocalStorage } from '@mantine/hooks'
 import { ModalsProvider } from '@mantine/modals'
 import { NotificationsProvider } from '@mantine/notifications'
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 import { Route, Routes } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
@@ -17,19 +17,20 @@ import { authAtom } from './atoms/authAtom.js'
 import { PersistLogin } from './components/auth/PersistLogin'
 import { RequireAuth } from './components/auth/RequireAuth'
 import Unauthorized from './components/auth/Unauthorized'
-import { Layout } from './components/Layout'
-import { Home } from './pages/Home'
-import { SignIn } from './pages/SignIn'
-import { SignUp } from './pages/SignUp'
-import './styles/global.css'
+import { Layout } from './components/layouts/general.layout'
+import { QuestionsPageLayout } from './components/layouts/questions-page.layout.js'
+import { Home } from './pages/home.page'
+import { Missing } from './pages/not-found.page.js'
+import { SignIn } from './pages/sign-in.page'
+import { SignUp } from './pages/sign-up.page'
 
-const Questions = React.lazy(() => import('./pages/Questions'))
-const QuestionsHistory = React.lazy(() => import('./pages/QuestionsHistory'))
-const Sales = React.lazy(() => import('./pages/Sales'))
-const Settings = React.lazy(() => import('./pages/Settings'))
-const Publicator = React.lazy(() => import('./pages/Publicator'))
-const MeliCallback = React.lazy(() => import('./pages/MeliCallback'))
-const MeliLink = React.lazy(() => import('./pages/MeliLink'))
+const PendingQuestions = React.lazy(() => import('./pages/questions.page'))
+const QuestionsHistory = React.lazy(() => import('./pages/questions-history.page'))
+const Sales = React.lazy(() => import('./pages/orders.page'))
+const Settings = React.lazy(() => import('./pages/auto-message.page'))
+const Publicator = React.lazy(() => import('./pages/publicator.page'))
+const MeliCallback = React.lazy(() => import('./pages/meli-callback.page'))
+const MeliLink = React.lazy(() => import('./pages/meli-link.page'))
 
 const ROLES = {
   User: 2001,
@@ -46,9 +47,9 @@ function App() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (auth.user) {
+    if (auth.userId) {
       const source = new EventSource(
-        `${import.meta.env.VITE_API_URL}meli/updates?id=${auth.user}`,
+        `${import.meta.env.VITE_API_URL}meli/updates?id=${auth.userId}`,
         {
           withCredentials: true
         }
@@ -97,29 +98,17 @@ function App() {
                   <Route
                     path="auth/link-meli"
                     element={
-                      <React.Suspense
-                        fallback={
-                          <Center>
-                            <Loader />
-                          </Center>
-                        }
-                      >
+                      <Suspense fallback={<Loader />}>
                         <MeliLink />
-                      </React.Suspense>
+                      </Suspense>
                     }
                   />
                   <Route
                     path="auth/callback"
                     element={
-                      <React.Suspense
-                        fallback={
-                          <Center>
-                            <Loader />
-                          </Center>
-                        }
-                      >
+                      <Suspense fallback={<Loader />}>
                         <MeliCallback />
-                      </React.Suspense>
+                      </Suspense>
                     }
                   />
                 </Route>
@@ -130,80 +119,18 @@ function App() {
                   <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
                     <Route path="/" element={<Home />} />
 
-                    <Route
-                      path="questions"
-                      element={
-                        <React.Suspense
-                          fallback={
-                            <Center>
-                              <Loader />
-                            </Center>
-                          }
-                        >
-                          <Questions />
-                        </React.Suspense>
-                      }
-                    />
+                    <Route path="questions" element={<QuestionsPageLayout />}>
+                      <Route index element={<PendingQuestions />} />
+                      <Route path="history" element={<QuestionsHistory />} />
+                      <Route path="pending" element={<PendingQuestions />} />
+                      <Route path="*" element={<Missing />} />
+                    </Route>
 
-                    <Route
-                      path="questions/history"
-                      element={
-                        <React.Suspense
-                          fallback={
-                            <Center>
-                              <Loader />
-                            </Center>
-                          }
-                        >
-                          <QuestionsHistory />
-                        </React.Suspense>
-                      }
-                    />
+                    <Route path="orders" element={<Sales />} />
 
-                    <Route
-                      path="sales"
-                      element={
-                        <React.Suspense
-                          fallback={
-                            <Center>
-                              <Loader />
-                            </Center>
-                          }
-                        >
-                          <Sales />
-                        </React.Suspense>
-                      }
-                    />
+                    <Route path="automessages" element={<Settings />} />
 
-                    <Route
-                      path="settings"
-                      element={
-                        <React.Suspense
-                          fallback={
-                            <Center>
-                              <Loader />
-                            </Center>
-                          }
-                        >
-                          <Settings />
-                        </React.Suspense>
-                      }
-                    />
-
-                    <Route
-                      path="publish"
-                      element={
-                        <React.Suspense
-                          fallback={
-                            <Center>
-                              <Loader />
-                            </Center>
-                          }
-                        >
-                          <Publicator />
-                        </React.Suspense>
-                      }
-                    />
+                    <Route path="publish" element={<Publicator />} />
                   </Route>
                 </Route>
               </Route>

@@ -1,18 +1,20 @@
 import { atom } from 'recoil'
 
 interface AuthState {
-  user: string | null
+  userId: string | null
   roles: string[]
   accessToken: string | null
   persist: boolean
+  meliId?: string | null
 }
 
 export const authAtom = atom<AuthState>({
   key: 'auth',
   default: {
-    user: null,
+    userId: null,
     roles: [],
     accessToken: null,
-    persist: !!localStorage.getItem('persist') || false
+    persist: !!localStorage.getItem('persist') || false,
+    meliId: null
   }
 })

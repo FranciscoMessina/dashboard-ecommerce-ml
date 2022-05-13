@@ -1,48 +1,42 @@
-import { AppShell, ScrollArea } from '@mantine/core'
+import { AppShell, Loader, ScrollArea } from '@mantine/core'
 import { SpotlightProvider, useSpotlight } from '@mantine/spotlight'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { Notes, ShoppingCart } from 'tabler-icons-react'
-import { events } from '../helpers/events.js'
-import { Sidebar } from './Sidebar'
-import { Topbar } from './Topbar'
+import { events } from '../../helpers/events.js'
+import { Sidebar } from '../Sidebar'
+import { Topbar } from '../Topbar'
 
 interface LayoutProps {}
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  // const viewport = useRef<HTMLDivElement>(null)
-
-  // events.on('scroll.top', () => {
-  //   viewport.current?.scrollTo({ top: 0, behavior: 'smooth' })
-  // })
-
   return (
-    // <ScrollArea sx={{ height: '100vh' }} scrollbarSize={6} viewportRef={viewport}>
-      <SpotlightProvider
-        actions={[]}
-        nothingFoundMessage="No se encontró nada..."
-        shortcut={['mod + k', 'mod + /']}
+    <SpotlightProvider
+      actions={[]}
+      nothingFoundMessage="No se encontró nada..."
+      shortcut={['mod + k', 'mod + /']}
+    >
+      <AppShell
+        padding="md"
+        fixed
+        navbarOffsetBreakpoint="sm"
+        navbar={<Sidebar />}
+        header={<Topbar />}
+        zIndex={100}
+        styles={(theme) => ({
+          main: {
+            backgroundColor:
+              theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[1]
+          }
+        })}
       >
-        <AppShell
-          padding="md"
-          fixed
-          navbarOffsetBreakpoint="sm"
-          navbar={<Sidebar />}
-          header={<Topbar />}
-          zIndex={100}
-          styles={(theme) => ({
-            main: {
-              backgroundColor:
-                theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[1]
-            }
-          })}
-        >
-          <SpotlightHandler>
+        <SpotlightHandler>
+          <Suspense fallback={<Loader />}>
             <Outlet />
-          </SpotlightHandler>
-        </AppShell>
-      </SpotlightProvider>
-    // </ScrollArea>
+          </Suspense>
+        </SpotlightHandler>
+      </AppShell>
+    </SpotlightProvider>
   )
 }
 

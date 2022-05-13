@@ -10,6 +10,8 @@ import {
   Title
 } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -65,7 +67,9 @@ export function SignUp() {
   const { classes } = useStyles()
   const location = useLocation()
   const navigate = useNavigate()
-  const { setAuth} = useAuth()
+  const { setAuth } = useAuth()
+  const [errors, setErrors] = useState<string[]>([])
+
 
   console.log(location)
 
@@ -82,7 +86,7 @@ export function SignUp() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState
   } = useForm<SignUpFormData>({
     defaultValues: {
       email: '',
@@ -104,13 +108,21 @@ export function SignUp() {
         setAuth({
           accessToken: response.data.accessToken,
           roles: response.data.roles,
-          user: response.data.id,
+          userId: response.data.id,
           persist: true
         })
         navigate('/')
       }
     } catch (err: any) {
-      console.log(err.response)
+      if ('response' in err) {
+        const { response } = err as AxiosError
+        console.log(response)
+
+        if (response?.status === 401) {
+          return setErrors(['Email o contraseña incorrectos'])
+        }
+      }
+      console.log(err.toJSON())
     }
   }
 
@@ -127,7 +139,7 @@ export function SignUp() {
             placeholder="hola@gmail.com"
             size="md"
             {...register('email')}
-            error={errors.email?.message}
+            error={formState.errors.email?.message}
           />
           <PasswordInput
             label="Contraseña"
@@ -135,7 +147,7 @@ export function SignUp() {
             mt="md"
             size="md"
             {...register('password')}
-            error={errors.password?.message}
+            error={formState.errors.password?.message}
           />
           <PasswordInput
             label="Confirmar contraseña"
@@ -143,7 +155,7 @@ export function SignUp() {
             mt="md"
             size="md"
             {...register('passwordConfirm')}
-            error={errors.passwordConfirm?.message}
+            error={formState.errors.passwordConfirm?.message}
           />
 
           <Button fullWidth mt="xl" size="md" type="submit">

@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Center,
   Container,
   createStyles,
@@ -7,23 +6,20 @@ import {
   Group,
   Loader,
   Pagination,
-  Stack,
-  UnstyledButton
+  Stack
 } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { NavLink, useSearchParams } from 'react-router-dom'
-import { Settings } from 'tabler-icons-react'
-import { HistoryQuestion } from '../components/question/HistoryQuestion.js'
+import { HistoryQuestion } from '../components/questions/history-question.component'
 import { useAxiosInstance } from '../hooks/useAxios.js'
-import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
-import { MeliApiError, MeliQuestionData, MeliQuestionsResponse } from '../types/types.js'
+import { MeliQuestionData, MeliQuestionsResponse } from '../types/types.js'
 
 const useStyles = createStyles((theme) => ({
   link: {
     textDecoration: 'none',
-    color: 'white',
+    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.gray[8],
     padding: '10px',
     borderRadius: '3px',
     '&:hover': {
@@ -35,7 +31,7 @@ const useStyles = createStyles((theme) => ({
       backgroundColor:
         theme.colorScheme === 'dark'
           ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
-          : theme.colors[theme.primaryColor][0],
+          : theme.colors[theme.primaryColor][1],
       color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 7]
     }
   }
@@ -58,8 +54,7 @@ export default function QuestionsHistory() {
     .filter(Boolean)
     .join('&')
 
-  console.log(stringParams);
-  
+  console.log(stringParams)
 
   const questionsData = useQuery(
     ['questions-history', offset],
@@ -89,46 +84,35 @@ export default function QuestionsHistory() {
   }
 
   return (
-    <Container size={1500}>
-      <NavLink to="/questions" className={classes.link}>
-        Pendientes
-      </NavLink>
-
-      <NavLink to="/questions/history" style={{ marginLeft: '5px'}} className={cx(classes.link, { [classes.linkActive]: true })}>
-        Historial
-      </NavLink>
-
-      <Divider mb="sm" mt="xs" />
-      <Group position="center" align="center" sx={{ width: '100%' }}>
-        {data?.data?.total! > 0 && (
-          <Stack sx={{ width: '100%' }}>
-            {data?.data.results.map((question: MeliQuestionData) => (
-              <HistoryQuestion question={question} key={question.id} />
-            ))}
-            <Stack>
-              {isFetching && (
-                <Center>
-                  <Loader variant="dots" />
-                </Center>
-              )}
-              {isSuccess && data?.data.limit < data?.data.total && (
-                <Center>
-                  <Pagination
-                    onChange={(page) => {
-                      window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                      })
-                      setOffset(page === 1 ? 0 : (page - 1) * data.data.limit)
-                    }}
-                    total={Math.ceil(data?.data.total! / data?.data.limit!)}
-                  />
-                </Center>
-              )}
-            </Stack>
+    <Group position="center" align="center" sx={{ width: '100%' }}>
+      {data?.data?.total! > 0 && (
+        <Stack sx={{ width: '100%' }}>
+          {data?.data.results.map((question: MeliQuestionData) => (
+            <HistoryQuestion question={question} key={question.id} />
+          ))}
+          <Stack>
+            {isFetching && (
+              <Center>
+                <Loader variant="dots" />
+              </Center>
+            )}
+            {isSuccess && data?.data.limit < data?.data.total && (
+              <Center>
+                <Pagination
+                  onChange={(page) => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth'
+                    })
+                    setOffset(page === 1 ? 0 : (page - 1) * data.data.limit)
+                  }}
+                  total={Math.ceil(data?.data.total! / data?.data.limit!)}
+                />
+              </Center>
+            )}
           </Stack>
-        )}
-      </Group>
-    </Container>
+        </Stack>
+      )}
+    </Group>
   )
 }

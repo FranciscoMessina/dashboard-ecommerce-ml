@@ -145,9 +145,9 @@ export function Sidebar() {
       route: '/questions',
       indicator: questions?.data?.total! > 0 ? questions?.data.total : undefined
     },
-    { icon: Box, label: 'Ventas', route: '/sales' },
+    { icon: Box, label: 'Ventas', route: '/orders' },
     { icon: Plus, label: 'Publicar', route: '/publish' },
-    { icon: Message2Code, label: 'Mensaje Automatico', route: '/settings' }
+    { icon: Message2Code, label: 'Mensaje Automatico', route: '/automessages' }
   ]
 
   const { width } = useViewportSize()
@@ -165,7 +165,7 @@ export function Sidebar() {
         accessToken: null,
         persist: false,
         roles: [],
-        user: null
+        userId: null
       })
     } catch (e) {
       console.error(e)

@@ -4,6 +4,7 @@ export interface QuickAnswer {
   name: string
   text: string
   color: string
+  position: number
 }
 
 export interface UserConfig {

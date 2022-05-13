@@ -18,7 +18,7 @@ import { useQueryClient } from 'react-query'
 import { ChevronDown, ChevronUp } from 'tabler-icons-react'
 import { useAxiosInstance } from '../../hooks/useAxios'
 import type { QuickAnswer as QuickAnswerType } from '../../types/types'
-import QuickAnswer from '../QuickAnswer'
+import QuickAnswer from '../questions/quick-answer.component'
 
 interface QuickAnswersConfigProps {
   quickAnswers: QuickAnswerType[]
