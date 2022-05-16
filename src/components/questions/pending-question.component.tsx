@@ -118,7 +118,7 @@ export const PendingQuestion: React.FC<QuestionProps> = ({ question, ...rest }) 
               })}
             >
               <Image
-                src={question.item.thumbnail}
+                src={question.item.secure_thumbnail}
                 alt={question.item.title}
                 fit="contain"
                 height={90}
