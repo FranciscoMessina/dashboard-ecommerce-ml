@@ -29,7 +29,7 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
     <Paper
       shadow={'md'}
       sx={(theme) => ({
-        width: '100%',
+        width: '100%'
       })}
     >
       <Group
@@ -127,22 +127,6 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
             </Text>
           </Box>
         ))}
-        {questions.total > questions.limit && (
-          <Box
-            p="xs"
-            sx={(theme) => ({
-              border: '1px solid',
-              borderTop: 0,
-              borderColor: theme.colors.blue[7],
-              backgroundColor:
-                theme.colorScheme === 'dark' ? theme.colors.gray[9] : theme.colors.gray[3]
-            })}
-          >
-            <Anchor component={Link} to={`/questions/history?from=${buyer.id}&item=${itemId}`}>
-              Ver mas preguntas
-            </Anchor>
-          </Box>
-        )}
       </Collapse>
     </Paper>
   )

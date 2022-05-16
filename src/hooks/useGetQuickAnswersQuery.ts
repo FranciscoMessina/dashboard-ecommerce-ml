@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from 'react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 import { QuickAnswer } from '../types/types'
 import axios from '../helpers/axios'
-import { useAxiosInstance } from './useAxios'
+import { useAxiosInstance } from './useAxiosInstance'
 
 export interface QuickAnswersSearchResult {
   query: string

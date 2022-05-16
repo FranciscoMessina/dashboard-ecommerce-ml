@@ -17,7 +17,7 @@ import { Checks } from 'tabler-icons-react'
 import getCaretCoordinates from 'textarea-caret'
 import { getActiveToken } from '../../helpers'
 import { replaceAt } from '../../helpers/replaceAt.js'
-import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useSearchMLItemQuery } from '../../hooks/useSearchMLItemsQuery'
 import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery'
 import { MeliItem, QuickAnswer } from '../../types/types'
@@ -65,7 +65,8 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
   comboboxOptions: {
     position: 'absolute',
-    zIndex: 10,
+    zIndex: 1000,
+    minWidth: '250px',
     maxHeight: 60,
     paddingBlock: 2
   },
@@ -340,8 +341,7 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
                   style={{
                     top: `${top + height <= 76 ? top : 76}px`,
                     left: left - 35,
-                    minWidth: '250px',
-                    zIndex: 1000,
+             
                     ...styles
                   }}
                 >
@@ -383,8 +383,6 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
                   style={{
                     top: `${top + height <= 76 ? top : 76}px`,
                     left: left - 35,
-                    minWidth: '250px',
-                    zIndex: 1000,
                     ...styles
                   }}
                 >

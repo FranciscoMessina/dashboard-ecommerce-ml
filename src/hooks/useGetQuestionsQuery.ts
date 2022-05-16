@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios'
 import { useQuery, UseQueryOptions } from 'react-query'
 import { MeliQuestionsResponse } from '../types/types'
-import { useAxiosInstance } from './useAxios'
+import { useAxiosInstance } from './useAxiosInstance'
 
 export const useGetQuestionsQuery = (
   offset: number = 0,

@@ -61,7 +61,7 @@ export default function PendingQuestions() {
   useDocumentTitle(
     `${
       data?.data?.total && data?.data?.total > 0 ? `(${data?.data?.total})` : ''
-    } Preguntas - El Rio Libros`
+    } Preguntas`
   )
 
   if (isLoading) {

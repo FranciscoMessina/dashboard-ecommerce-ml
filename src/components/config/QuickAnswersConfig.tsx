@@ -16,7 +16,7 @@ import { useModals } from '@mantine/modals'
 import React, { MouseEvent } from 'react'
 import { useQueryClient } from 'react-query'
 import { ChevronDown, ChevronUp } from 'tabler-icons-react'
-import { useAxiosInstance } from '../../hooks/useAxios'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance'
 import type { QuickAnswer as QuickAnswerType } from '../../types/types'
 import QuickAnswer from '../questions/quick-answer.component'
 

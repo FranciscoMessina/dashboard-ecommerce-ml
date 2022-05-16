@@ -13,7 +13,7 @@ import { useBooleanToggle } from '@mantine/hooks'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import { InfoCircle } from 'tabler-icons-react'
-import { useAxiosInstance } from '../../hooks/useAxios'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance'
 
 interface AutoMessageConfigProps {
   autoMessage: {

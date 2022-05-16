@@ -2,7 +2,7 @@ import { Drawer, Title, Text, Divider, Space, Textarea, Button, Group } from '@m
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
-import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useUserConfigQuery } from '../../hooks/useUserConfigQuery.js'
 
 interface QuestionsConfigProps {

@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import { AxisY, FileDownload, FileX, Pencil, TrashX } from 'tabler-icons-react'
-import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { QuickAnswer as QAType } from '../../types/types.js'
 
 const useStyles = createStyles((theme, { color }: { color: string }) => ({

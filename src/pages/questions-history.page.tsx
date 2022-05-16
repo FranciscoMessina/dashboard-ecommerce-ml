@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { NavLink, useSearchParams } from 'react-router-dom'
 import { HistoryQuestion } from '../components/questions/history-question.component'
-import { useAxiosInstance } from '../hooks/useAxios.js'
+import { useAxiosInstance } from '../hooks/useAxiosInstance.js'
 import { MeliQuestionData, MeliQuestionsResponse } from '../types/types.js'
 
 const useStyles = createStyles((theme) => ({
@@ -68,7 +68,7 @@ export default function QuestionsHistory() {
 
   console.log(data?.data)
 
-  useDocumentTitle(`Historial de Preguntas - El Rio Libros`)
+  useDocumentTitle(`Historial de Preguntas`)
 
   if (isLoading) {
     return (

@@ -27,6 +27,7 @@ export const useAxiosInstance = () => {
         }
 
         if (error?.response?.status === 401 && !prevRequest?.sent) {
+          
           prevRequest.sent = true
 
           const token = await refresh()

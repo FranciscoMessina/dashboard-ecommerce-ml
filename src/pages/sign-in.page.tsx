@@ -66,7 +66,7 @@ interface SignInFormData {
 }
 
 export function SignIn() {
-  useDocumentTitle('Login - El Rio Libros')
+  useDocumentTitle('Login')
   const { classes } = useStyles()
   const { auth, setAuth } = useAuth()
   const navigate = useNavigate()
@@ -96,7 +96,7 @@ export function SignIn() {
       console.log(response)
 
       setAuth({
-        accessToken: response.data.accessToken as string,
+        accessToken: response.data.accessToken,
         persist: values.persist,
         userId: response.data.id,
         roles: response.data.roles,

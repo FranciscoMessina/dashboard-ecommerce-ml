@@ -17,7 +17,7 @@ import { AxiosError } from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
-import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery.js'
 import { EditableQuickAnswer } from './editable-quick-answer.component'
 

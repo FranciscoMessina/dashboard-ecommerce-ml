@@ -8,7 +8,7 @@ import {
 } from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import { ModalsProvider } from '@mantine/modals'
-import { NotificationsProvider } from '@mantine/notifications'
+import { NotificationsProvider, useNotifications } from '@mantine/notifications'
 import React, { Suspense, useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 import { Route, Routes } from 'react-router-dom'
@@ -19,6 +19,7 @@ import { RequireAuth } from './components/auth/RequireAuth'
 import Unauthorized from './components/auth/Unauthorized'
 import { Layout } from './components/layouts/general.layout'
 import { QuestionsPageLayout } from './components/layouts/questions-page.layout.js'
+import { UpdatesHandler } from './components/updates-handler.component.js'
 import { Home } from './pages/home.page'
 import { Missing } from './pages/not-found.page.js'
 import { SignIn } from './pages/sign-in.page'
@@ -43,41 +44,6 @@ function App() {
     key: 'color-scheme',
     defaultValue: 'light'
   })
-  const auth = useRecoilValue(authAtom)
-  const queryClient = useQueryClient()
-
-  useEffect(() => {
-    if (auth.userId) {
-      const source = new EventSource(
-        `${import.meta.env.VITE_API_URL}meli/updates?id=${auth.userId}`,
-        {
-          withCredentials: true
-        }
-      )
-
-      source.onopen = () => {
-        console.log('Connected to events')
-      }
-
-      source.onmessage = (ev) => {
-        console.log(JSON.parse(ev.data))
-
-        // TODO: Test different accounts receiving events.
-
-        const notification = JSON.parse(ev.data)
-
-        if (notification.topic === 'questions') {
-          setTimeout(
-            () =>
-              queryClient.refetchQueries(['questions'], {
-                active: true
-              }),
-            500
-          )
-        }
-      }
-    }
-  }, [auth])
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme((curr) => (curr === 'dark' ? 'light' : 'dark'))
@@ -87,6 +53,7 @@ function App() {
       <MantineProvider theme={{ colorScheme }} withNormalizeCSS withGlobalStyles>
         <NotificationsProvider>
           <ModalsProvider>
+            <UpdatesHandler />
             <Routes>
               <Route element={<PersistLogin />}>
                 {/* Public routes */}

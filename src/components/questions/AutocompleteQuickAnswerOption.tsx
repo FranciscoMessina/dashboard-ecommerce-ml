@@ -50,7 +50,8 @@ export const AutocompleteQuickAnswerOption: React.FC<AutocompleteQuickAnswerOpti
             sx={(theme) => ({
               borderLeft: 4,
               borderLeftStyle: 'solid',
-              borderColor: active ? theme.colors.yellow[9] : 'transparent'
+              borderColor: active ? theme.colors.yellow[9] : 'transparent',
+              textTransform: 'uppercase'
             })}
           >
             {value.name}

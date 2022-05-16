@@ -3,7 +3,7 @@ import { useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
 
 export default  function Publicator() {
-  useDocumentTitle('Publicar - El Rio Libros')
+  useDocumentTitle('Publicar')
   const [data, setData] = useState({
     isbn: '',
     title: '',

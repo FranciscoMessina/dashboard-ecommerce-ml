@@ -15,8 +15,8 @@ export default defineConfig({
     // VitePWA({
     //   includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
     //   manifest: {
-    //     name: 'El Rio Libros',
-    //     short_name: 'El Rio Libros',
+    //     name: '',
+    //     short_name: '',
     //     description: 'Super app',
     //     theme_color: '#ffffff',
     //     icons: [

@@ -25,7 +25,7 @@ import {
 } from 'tabler-icons-react'
 import { navbarAtom } from '../atoms/navbarAtom'
 import { useAuth } from '../hooks/useAuth'
-import { useAxiosInstance } from '../hooks/useAxios'
+import { useAxiosInstance } from '../hooks/useAxiosInstance'
 import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery.js'
 
 const useStyles = createStyles((theme) => ({

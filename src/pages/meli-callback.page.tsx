@@ -6,7 +6,7 @@ import { MercadoLibreIcon } from '../components/SocialIcons/MercadoLibreIcon.js'
 import { useAuth } from '../hooks/useAuth.js'
 
 export default function MeliLink() {
-  useDocumentTitle('Conectar a Mercado Libre - El Rio Libros')
+  useDocumentTitle('Conectar a Mercado Libre')
   const { auth, setAuth } = useAuth()
   const theme = useMantineTheme()
   const [params, setParams] = useSearchParams()

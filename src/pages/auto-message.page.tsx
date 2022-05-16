@@ -5,7 +5,7 @@ import { QuestionsConfig } from '../components/config/QuestionsConfig'
 import { useUserConfigQuery } from '../hooks/useUserConfigQuery'
 
 const Settings: React.FC = () => {
-  useDocumentTitle('Configuración - El Rio Libros')
+  useDocumentTitle('Mensajes Automaticos')
   const userConfigResult = useUserConfigQuery()
 
   const { data, isError, error, isLoading } = userConfigResult
@@ -40,12 +40,6 @@ const Settings: React.FC = () => {
         <Title order={2}>Configuración</Title>
       </Paper>
 
-      <QuestionsConfig
-        messages={{
-          hello: data?.data.hello,
-          signature: data?.data.signature
-        }}
-      />
       <AutoMessageConfig autoMessage={data?.data.autoMessage!} />
     </Group>
   )

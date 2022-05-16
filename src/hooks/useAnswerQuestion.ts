@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from 'react-query'
-import { useAxiosInstance } from './useAxios'
+import { useAxiosInstance } from './useAxiosInstance'
 
 export const useAnswerQuestion = (options: UseMutationOptions) => {
   const queryClient = useQueryClient()

@@ -39,7 +39,7 @@ const data2 = {
 
 export function Home() {
   const theme = useMantineTheme()
-  useDocumentTitle('El Rio Libros')
+  useDocumentTitle('Inicio')
 
   return (
     <Container fluid>

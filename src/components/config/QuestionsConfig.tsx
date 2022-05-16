@@ -3,7 +3,7 @@ import { useModals } from '@mantine/modals'
 import React from 'react'
 import { useQueryClient } from 'react-query'
 import { InfoCircle } from 'tabler-icons-react'
-import { useAxiosInstance } from '../../hooks/useAxios'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance'
 
 interface QuestionsConfigProps {
   messages?: {

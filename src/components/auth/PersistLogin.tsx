@@ -9,7 +9,6 @@ export const PersistLogin = () => {
   const refresh = useRefreshToken()
   const { auth, setAuth } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
 
   useEffect(() => {
     let isMounted = true

@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from 'react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 import { MeliItem, QuickAnswer } from '../types/types'
 
-import { useAxiosInstance } from './useAxios'
+import { useAxiosInstance } from './useAxiosInstance'
 
 export interface MeliItemsSearchResult {
   status: string

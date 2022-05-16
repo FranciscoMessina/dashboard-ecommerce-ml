@@ -5,7 +5,7 @@ import { useNotifications } from '@mantine/notifications'
 import { FC, useCallback } from 'react'
 import { useQueryClient } from 'react-query'
 import { Check, DotsVertical, PlayerPause, PlayerPlay, Trash, X } from 'tabler-icons-react'
-import { useAxiosInstance } from '../../hooks/useAxios'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance'
 
 interface QuestionOptionsDropdownProps {
   blockUser?: (id: number) => void
@@ -31,7 +31,7 @@ export const QuestionOptionsDropdown: FC<QuestionOptionsDropdownProps> = ({
     const modalId = modals.openConfirmModal({
       centered: true,
       title: 'Eliminar Pregunta.',
-      children: <Text size="sm">Estas seguro que queres eliminar esta pregunta?</Text>,
+      children: <Text size="sm">Estas seguro que queres eliminar esta pregunta? Al parecer esto cuenta como no respondida y aumenta el tiempo promedio de respuesta, mejor no hacerlo, no?</Text>,
       labels: { confirm: 'Eliminar', cancel: 'Cancelar' },
       confirmProps: { color: 'red' },
       onCancel: () => {

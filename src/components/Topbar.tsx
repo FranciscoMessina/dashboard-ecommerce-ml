@@ -47,7 +47,7 @@ export function Topbar() {
               fontFamily: "'Playfair Display', 'serif'"
             }}
           >
-            El Rio Libros
+            SuperApp
           </Text>
         </MediaQuery>
 

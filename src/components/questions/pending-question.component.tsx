@@ -17,7 +17,7 @@ import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Message } from 'tabler-icons-react'
 import { getTimeAgo, sleep } from '../../helpers'
-import { useAxiosInstance } from '../../hooks/useAxios.js'
+import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useUserConfigQuery } from '../../hooks/useUserConfigQuery'
 import { MeliQuestionData } from '../../types/types'
 import InputWithAutocomplete from './autocomplete-input.component'
@@ -29,7 +29,13 @@ interface QuestionProps {
 }
 
 export const PendingQuestion: React.FC<QuestionProps> = ({ question, ...rest }) => {
-  const userConfig = useUserConfigQuery()
+  const userConfig = useUserConfigQuery({
+    onSuccess: (data) => {
+      methods.setValue('hello', !!data.data.hello)
+      methods.setValue('signature', !!data.data.signature)
+    }
+      
+  })
   const axios = useAxiosInstance()
 
   const methods = useForm({
@@ -53,7 +59,7 @@ export const PendingQuestion: React.FC<QuestionProps> = ({ question, ...rest }) 
       data.signature ? ` ${userConfig.data?.data.signature}` : ''
     }`
 
-    return console.log({ finalAnswer })
+   console.log({ finalAnswer })
 
     try {
       const response = await axios.post('meli/answers', {

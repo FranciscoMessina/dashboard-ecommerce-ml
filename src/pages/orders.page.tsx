@@ -1,27 +1,24 @@
 import {
-  Box,
   Center,
   Container,
   Group,
-  Loader,
-  Paper,
-  Text,
+  Loader, Text,
   TextInput,
   UnstyledButton,
   useMantineTheme
 } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { Adjustments, Search } from 'tabler-icons-react'
+import { CartOrderDisplay } from '../components/cart-order-display.component.js'
 import OrderDisplay from '../components/OrderDisplay'
 import { useOrdersQuery } from '../hooks/useOrdersQuery'
-import { MeliCompleteOrderData } from '../types/types'
 
 export default function Sales() {
   const theme = useMantineTheme()
 
   const ordersQuery = useOrdersQuery({})
 
-  useDocumentTitle('Ventas - El Rio Libros')
+  useDocumentTitle('Ventas')
 
   // console.log(ordersQuery.data)
 
@@ -39,7 +36,7 @@ export default function Sales() {
 
   return (
     <Container size={1500}>
-      <Group direction="column" spacing={25}>
+      <Group direction="column" spacing="xl" sx={{ width: '100%' }}>
         <Group sx={{ width: '100%' }}>
           <UnstyledButton
             p="sm"
@@ -60,9 +57,9 @@ export default function Sales() {
             placeholder="Buscar ventas"
             radius="lg"
             variant="filled"
-            styles={theme => ({
+            styles={(theme) => ({
               input: {
-                backgroundColor: theme.colorScheme === 'light' ? 'white' : theme.colors.dark[6],
+                backgroundColor: theme.colorScheme === 'light' ? 'white' : theme.colors.dark[6]
               }
             })}
             size="xs"
@@ -70,9 +67,13 @@ export default function Sales() {
           />
         </Group>
 
-        {ordersQuery.data?.data.results.map((order: MeliCompleteOrderData) => (
-          <OrderDisplay order={order} key={order.id} />
-        ))}
+        {ordersQuery.data?.data.results.map((order) => {
+          if (order.cartId) {
+            return <CartOrderDisplay order={order} key={order.id} />
+          } else {
+            return <OrderDisplay order={order} key={order.id} />
+          }
+        })}
       </Group>
     </Container>
   )

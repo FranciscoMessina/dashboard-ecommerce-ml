@@ -63,7 +63,7 @@ interface SignUpFormData {
 }
 
 export function SignUp() {
-  useDocumentTitle('Registro - El Rio Libros')
+  useDocumentTitle('Registro ')
   const { classes } = useStyles()
   const location = useLocation()
   const navigate = useNavigate()
