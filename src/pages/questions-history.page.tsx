@@ -12,7 +12,7 @@ import { useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { NavLink, useSearchParams } from 'react-router-dom'
-import { HistoryQuestion } from '../components/questions/history-question.component'
+import { HistoryQuestion } from '../components/questions/HistoryQuestion'
 import { useAxiosInstance } from '../hooks/useAxiosInstance.js'
 import { MeliQuestionData, MeliQuestionsResponse } from '../types/types.js'
 

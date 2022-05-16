@@ -2,7 +2,7 @@ import { Group, ActionIcon, Divider, Container, createStyles, Loader } from '@ma
 import React, { Suspense, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { Settings } from 'tabler-icons-react'
-import { QuestionsConfig } from '../questions/questions-config.component.js'
+import { QuestionsConfig } from '../questions/QuestionsConfig'
 
 interface QuestionsPageLayout {}
 

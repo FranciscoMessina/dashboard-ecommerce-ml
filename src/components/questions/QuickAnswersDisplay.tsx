@@ -10,8 +10,8 @@ import {
 import * as Dialog from '@radix-ui/react-dialog'
 import { Edit } from 'tabler-icons-react'
 import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery.js'
-import QuickAnswer from './quick-answer.component'
-import { QuickAnswersModalContent } from './quick-answers-modal-content.component.js'
+import QuickAnswer from './QuickAnswer'
+import { QuickAnswersModalContent } from './QuickAnswersModalContent.js'
 
 const useStyles = createStyles((theme) => ({
   content: {

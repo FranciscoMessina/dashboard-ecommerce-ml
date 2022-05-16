@@ -20,9 +20,9 @@ import { getTimeAgo, sleep } from '../../helpers'
 import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useUserConfigQuery } from '../../hooks/useUserConfigQuery'
 import { MeliQuestionData } from '../../types/types'
-import InputWithAutocomplete from './autocomplete-input.component'
-import PreviousQuestions from './previous-questions.component'
-import { QuestionOptionsDropdown } from './question-options.component'
+import InputWithAutocomplete from './TypeaheadInput'
+import PreviousQuestions from './PreviousQuestions'
+import { QuestionOptionsDropdown } from './QuestionsOptions'
 
 interface QuestionProps {
   question: MeliQuestionData

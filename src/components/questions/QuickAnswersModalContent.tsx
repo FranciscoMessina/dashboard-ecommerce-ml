@@ -19,7 +19,7 @@ import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
 import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery.js'
-import { EditableQuickAnswer } from './editable-quick-answer.component'
+import { EditableQuickAnswer } from './EditableQuickAnswer'
 
 const useStyles = createStyles((theme, { color }: { color: string }) => ({
   dragHandle: {

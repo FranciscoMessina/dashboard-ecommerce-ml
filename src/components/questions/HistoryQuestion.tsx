@@ -2,7 +2,7 @@ import { Anchor, Box, Divider, Group, MediaQuery, Paper, Text, Image } from '@ma
 import React from 'react'
 import { Message, Message2 } from 'tabler-icons-react'
 import { MeliQuestionData } from '../../types/types.js'
-import { QuestionOptionsDropdown } from './question-options.component'
+import { QuestionOptionsDropdown } from './QuestionsOptions'
 
 interface HistoryQuestionProps {
   question: MeliQuestionData
@@ -36,7 +36,7 @@ export const HistoryQuestion: React.FC<HistoryQuestionProps> = ({ question }) =>
           })}
         >
           <Image
-            src={question.item.thumbnail}
+            src={question.item.secure_thumbnail}
             alt={question.item.title}
             fit="contain"
             height={90}

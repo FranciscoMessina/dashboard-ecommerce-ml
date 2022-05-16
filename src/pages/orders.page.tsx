@@ -9,7 +9,7 @@ import {
 } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { Adjustments, Search } from 'tabler-icons-react'
-import { CartOrderDisplay } from '../components/cart-order-display.component.js'
+import { CartOrderDisplay } from '../components/CartOrderDisplay'
 import OrderDisplay from '../components/OrderDisplay'
 import { useOrdersQuery } from '../hooks/useOrdersQuery'
 
