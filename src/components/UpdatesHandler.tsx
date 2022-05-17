@@ -47,6 +47,16 @@ export const UpdatesHandler: React.FC<UpdatesHandlerProps> = ({}) => {
             500
           )
         }
+
+        if (notification.topic === 'orders_v2') {
+          setTimeout(
+            () =>
+              queryClient.refetchQueries(['orders'], {
+                active: true
+              }),
+            500
+          )
+        }
       }
     }
   }, [auth])
