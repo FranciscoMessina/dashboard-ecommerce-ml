@@ -1,50 +1,19 @@
-import {
-  ActionIcon,
-  Center,
-  Container,
-  createStyles,
-  Divider,
-  Group,
-  Loader,
-  Pagination,
-  Stack,
-  Text,
-  UnstyledButton
-} from '@mantine/core'
+import { Center, Group, Loader, Pagination, Stack, Text } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { Settings } from 'tabler-icons-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PendingQuestion from '../components/questions/PendingQuestion'
 import QuickAnswersDisplay from '../components/questions/QuickAnswersDisplay'
 import { useGetQuestionsQuery } from '../hooks/useGetQuestionsQuery'
 import { MeliQuestionData } from '../types/types'
 
-const useStyles = createStyles((theme) => ({
-  link: {
-    textDecoration: 'none',
-    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.gray[8],
-    padding: '10px',
-    borderRadius: '3px',
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0]
-    }
-  },
-  linkActive: {
-    '&, &:hover': {
-      backgroundColor:
-        theme.colorScheme === 'dark'
-          ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
-          : theme.colors[theme.primaryColor][1],
-      color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 7]
-    }
-  }
-}))
-
 export default function PendingQuestions() {
-  const { cx, classes } = useStyles()
-
   const [offset, setOffset] = useState(0)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    navigate('/questions/pending')
+  }, [])
 
   const questionsData = useGetQuestionsQuery(offset, {
     keepPreviousData: true,
@@ -59,9 +28,7 @@ export default function PendingQuestions() {
   // console.log(data?.data)
 
   useDocumentTitle(
-    `${
-      data?.data?.total && data?.data?.total > 0 ? `(${data?.data?.total})` : ''
-    } Preguntas`
+    `${data?.data?.total && data?.data?.total > 0 ? `(${data?.data?.total})` : ''} Preguntas`
   )
 
   if (isLoading) {
