@@ -23,6 +23,7 @@ import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery'
 import { MeliItem, QuickAnswer } from '../../types/types'
 import { AutocompleteMeliItem } from './AutocompleteMeliItem.js'
 import { AutocompleteQuickAnswerOption } from './AutocompleteQuickAnswerOption.js'
+import { AutocompleteLinkOption } from './AutocompleteLinkOption'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   comboboxInput: {
@@ -140,8 +141,8 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
   interface AutocompleteState {
     value: string
     query: string
-    results: MeliItem[] | QuickAnswer[]
-    type: 'item' | 'answer' | ''
+    results: MeliItem[] | QuickAnswer[] | string[]
+    type: 'item' | 'answer' | '' | 'link'
     loading: boolean
   }
   const [autocomplete, setAutocomplete] = useSetState<AutocompleteState>({
@@ -195,7 +196,7 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
     if (!result?.word) return setAutocomplete({ query: '', type: '', results: [] })
 
     const { word } = result
-    if (/^[@#]\w{0,30}$/.test(word)) {
+    if (/^[@#%]\w{0,30}$/.test(word)) {
       const split = word.split('_')
 
       const joined = split.join(' ')
@@ -234,6 +235,18 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
       })
     }
   }, [query, searchMlItems, searchQuickAnswers])
+
+  useEffect(() => {
+    if (!textareaRef.current) return
+
+    const { value, selectionEnd } = textareaRef.current
+
+    const result = getActiveToken(value, selectionEnd || 0)
+
+    if (result?.word.includes('%')) {
+      setAutocomplete({ type: 'link', loading: false, results: [result.word.slice(1)] })
+    }
+  }, [autocomplete.query])
 
   const drop = (e: React.DragEvent<HTMLTextAreaElement>) => {
     if (!textareaRef.current) return
@@ -341,7 +354,7 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
                   style={{
                     top: `${top + height <= 76 ? top : 76}px`,
                     left: left - 35,
-             
+
                     ...styles
                   }}
                 >
@@ -358,14 +371,13 @@ const InputWithAutocomplete: React.FC<InputWithAutocompleteProps> = ({}) => {
                   >
                     {autocomplete.results.map((value) => {
                       if (autocomplete.type === 'item') {
-                        return <AutocompleteMeliItem item={value as MeliItem} key={value.id} />
+                        let data = value as MeliItem
+                        return <AutocompleteMeliItem item={data} key={data.id} />
+                      } else if (autocomplete.type === 'answer') {
+                        let data = value as QuickAnswer
+                        return <AutocompleteQuickAnswerOption value={data} key={data.id} />
                       } else {
-                        return (
-                          <AutocompleteQuickAnswerOption
-                            value={value as QuickAnswer}
-                            key={value.id}
-                          />
-                        )
+                        return <AutocompleteLinkOption value={autocomplete.query.slice(1)} />
                       }
                     })}
                   </Paper>
