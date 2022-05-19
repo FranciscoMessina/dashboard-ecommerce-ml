@@ -49,10 +49,9 @@ const useStyles = createStyles((theme, { color }: { color: string }) => ({
 
 interface EditableQuickAnswerProps {
   quickAnswer: QAType
-  index: number
 }
 
-export const EditableQuickAnswer: React.FC<EditableQuickAnswerProps> = ({ quickAnswer, index }) => {
+export const EditableQuickAnswer: React.FC<EditableQuickAnswerProps> = ({ quickAnswer }) => {
   const queryClient = useQueryClient()
 
   const [edit, toggleEdit] = useBooleanToggle(false)

@@ -60,8 +60,9 @@ interface QuickAnswersModalContentProps {}
 
 export const QuickAnswersModalContent: React.FC<QuickAnswersModalContentProps> = ({}) => {
   const quickAnswers = useGetQuickAnswersQuery('', {
-    cacheTime: 36000,
-    refetchInterval: 36000
+    cacheTime: 0,
+    refetchInterval: false,
+    staleTime: 36000
   })
   const axios = useAxiosInstance()
   const queryClient = useQueryClient()
@@ -179,7 +180,7 @@ export const QuickAnswersModalContent: React.FC<QuickAnswersModalContentProps> =
       >
         {hasQuickAnswers ? (
           quickAnswers.data?.data.results.map((answer, index) => {
-            return <EditableQuickAnswer key={index} quickAnswer={answer} index={index} />
+            return <EditableQuickAnswer key={answer.id} quickAnswer={answer}  />
           })
         ) : (
           <Center>
