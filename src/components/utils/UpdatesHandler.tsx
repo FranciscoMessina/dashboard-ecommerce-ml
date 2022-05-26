@@ -2,7 +2,7 @@ import { useNotifications } from '@mantine/notifications'
 import React, { useEffect } from 'react'
 import { useQueryClient } from 'react-query'
 import { useRecoilValue } from 'recoil'
-import { authAtom } from '../atoms/authAtom.js'
+import { authAtom } from '../../atoms/authAtom.js'
 
 interface UpdatesHandlerProps {}
 

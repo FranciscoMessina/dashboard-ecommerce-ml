@@ -17,9 +17,9 @@ import { AxiosError } from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
-import { useAxiosInstance } from '../../hooks/useAxiosInstance.js'
-import { useGetQuickAnswersQuery } from '../../hooks/useGetQuickAnswersQuery.js'
-import { EditableQuickAnswer } from './EditableQuickAnswer'
+import { EditableQuickAnswer } from '.'
+import { useAxiosInstance, useGetQuickAnswersQuery } from '../../../hooks'
+
 
 const useStyles = createStyles((theme, { color }: { color: string }) => ({
   dragHandle: {

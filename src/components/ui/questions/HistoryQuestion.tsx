@@ -1,8 +1,7 @@
-import { Anchor, Box, Divider, Group, MediaQuery, Paper, Text, Image } from '@mantine/core'
+import { Anchor, Box, Divider, Group, Image, MediaQuery, Paper, Text } from '@mantine/core'
 import React from 'react'
 import { Message, Message2 } from 'tabler-icons-react'
-import { MeliQuestionData } from '../../types/types.js'
-import { QuestionOptionsDropdown } from './QuestionsOptions'
+import { MeliQuestionData } from '../../../types/types.js'
 
 interface HistoryQuestionProps {
   question: MeliQuestionData

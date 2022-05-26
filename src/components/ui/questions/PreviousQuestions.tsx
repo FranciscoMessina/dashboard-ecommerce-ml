@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { FC } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Message, Message2 } from 'tabler-icons-react'
-import { PreviousQuestion } from '../../types/types'
+import { PreviousQuestion } from '../../../types/types'
 
 interface PreviousQuestionsProps {
   questions: {
@@ -132,4 +132,4 @@ export const PreviousQuestions: FC<PreviousQuestionsProps> = ({ questions, buyer
   )
 }
 
-export default PreviousQuestions
+
