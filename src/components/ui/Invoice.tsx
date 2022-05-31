@@ -1,4 +1,4 @@
-import { Card, Collapse, Divider, Group, Text } from '@mantine/core'
+import { Box, Card, Collapse, Divider, Grid, Group, Text } from '@mantine/core'
 import { useState } from 'react'
 
 
@@ -20,14 +20,14 @@ export const Invoice = () => {
             <Divider my='sm' />
          </Card.Section>
 
-         <Group>
-            <Text>Productos: 18</Text>
-            <Collapse in={showItems}>
-               <div>
-                  Hello
-               </div>
-            </Collapse>
-         </Group>
+         <Grid>
+            <Grid.Col span={6}>
+               <Text>Productos: 18</Text>
+            </Grid.Col>
+            <Grid.Col span={4}>
+               <Text>Cliente:</Text>
+            </Grid.Col>
+         </Grid>
       </Card>
    )
 }

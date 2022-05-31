@@ -19,6 +19,7 @@ import { Home } from './pages/home.page'
 import { Missing } from './pages/not-found.page.js'
 import { SignIn } from './pages/sign-in.page'
 import { SignUp } from './pages/sign-up.page'
+import NewInvoice from './pages/new-invoice'
 
 const PendingQuestions = React.lazy(() => import('./pages/questions.page'))
 const QuestionsHistory = React.lazy(() => import('./pages/questions-history.page'))
@@ -94,6 +95,7 @@ function App() {
 
                               <Route path="publish" element={<Publicator />} />
                               <Route path="billing" element={<Billing />} />
+                              <Route path="billing/new" element={<NewInvoice />} />
                            </Route>
                         </Route>
                      </Route>

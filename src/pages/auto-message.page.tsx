@@ -29,16 +29,6 @@ const Settings: React.FC = () => {
             width: '100%'
          })}
       >
-         <Paper
-            p="sm"
-            shadow="md"
-            sx={(theme) => ({
-               width: '100%'
-            })}
-         >
-            <Title order={2}>Configuración</Title>
-         </Paper>
-
          <AutoMessageConfig autoMessage={data?.data.autoMessage!} />
       </Group>
    )
