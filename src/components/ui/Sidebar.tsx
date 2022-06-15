@@ -16,13 +16,15 @@ import { useRecoilState } from 'recoil'
 import {
    Box,
    FileInvoice,
+   GridDots,
    Home2,
    Icon as TablerIcon,
    Logout,
    Message2Code,
    Plus,
    QuestionMark,
-   Settings
+   Settings,
+   Tag
 } from 'tabler-icons-react'
 import { navbarAtom } from '../../atoms/navbarAtom'
 import { useAuth } from '../../hooks/useAuth'
@@ -146,7 +148,7 @@ export function Sidebar() {
          route: '/questions',
          indicator: questions?.data?.total! > 0 ? questions?.data.total : undefined
       },
-      { icon: Box, label: 'Ventas', route: '/orders' },
+      { icon: Tag, label: 'Ventas', route: '/orders' },
       { icon: Plus, label: 'Publicar', route: '/publish' },
       { icon: Message2Code, label: 'Mensaje Automatico', route: '/automessages' },
       { icon: FileInvoice, label: 'Facturas', route: '/billing' },
@@ -192,7 +194,7 @@ export function Sidebar() {
                   </Navbar.Section>
                   <Navbar.Section mb={10}>
                      <Group direction="column" align="center" spacing={1}>
-                        <NavbarLink icon={Settings} label="Configuración" route="/settings" />
+                        <NavbarLink icon={GridDots} label="Menú" route="/menu" />
 
                         <NavbarIcon icon={Logout} label="Deconectate" onClick={logout} />
                      </Group>

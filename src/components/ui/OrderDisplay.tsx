@@ -1,6 +1,6 @@
-import { Box, Button, Checkbox, Divider, Group, Paper, Text, useMantineTheme } from '@mantine/core'
+import { Badge, Box, Button, Checkbox, Divider, Group, Paper, Text, useMantineTheme } from '@mantine/core'
 import { FoundStatusButton, OrderItemInfo, OrderOptions } from '.'
-import { SearchStatus } from '../../types/types'
+import { SaleChannel, SearchStatus } from '../../types/types'
 
 
 
@@ -24,11 +24,40 @@ export function OrderDisplay({ order }: any) {
          break
    }
 
+
+   let saleChannel;
+   let badgeColor;
+
+   switch (order.saleChannel) {
+      case SaleChannel.LOCAL:
+         saleChannel = 'local';
+         badgeColor = ''
+         break;
+      case SaleChannel.ML:
+         saleChannel = 'meli'
+         badgeColor = '#ffeb10'
+
+         break;
+      case SaleChannel.MS:
+         saleChannel = 'mshop'
+         badgeColor = '#e53c8f'
+
+         break;
+      case SaleChannel.SHOP:
+         saleChannel = 'shop';
+         badgeColor = '#38b000'
+
+         break;
+   }
+
+
+
    return (
       <Paper shadow="lg" sx={{ width: '100%', borderLeft: `${borderColor} 3px solid` }}>
          <Group position="apart" px="sm" py="md">
             <Group align="center" p={0}>
                <Checkbox size="xs" radius="xs" aria-label="Seleccionar venta" />
+               <Badge sx={{ backgroundColor: badgeColor, color: 'black' }} variant='filled' size='xs'>{saleChannel}</Badge>
 
                <Text weight={600}>#{order.meliOrderIds[0]} </Text>
                <Divider orientation="vertical" size="xs" style={{ height: '20px' }} my={4} />

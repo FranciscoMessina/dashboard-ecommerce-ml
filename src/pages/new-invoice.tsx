@@ -1,37 +1,55 @@
 import { Autocomplete, Box, Button, Card, Center, Collapse, Container, Divider, Group, NumberInput, Paper, Space, Stack, Text, TextInput, Title } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
-import { useDocumentTitle } from '@mantine/hooks'
+import { randomId, useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
 import { Car, CurrencyDollar, FileInvoice } from 'tabler-icons-react'
-import { Invoice } from '../components/ui'
+import { Invoice, ProductAutocomplete } from '../components/ui'
 import 'dayjs/locale/es'
-import { InvoiceProduct } from '../components/ui/InvoiceProduct'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { InvoiceProduct } from '../components/ui'
+import { FormProvider, useFieldArray, useForm as useReactHookForm } from 'react-hook-form'
+import { FormList, formList, useForm } from '@mantine/form'
 
 interface FormValues {
    client: string;
-   date: string;
-   products: {
+   date: Date;
+   products: FormList<{
       title: string;
       price: number;
       quantity: number;
-   }[]
+      key: string;
+   }>
 }
 
 
 export default function NewInvoice() {
    useDocumentTitle('Nueva Venta')
 
-   const { register, handleSubmit, control, watch, setValue, getValues } = useForm<FormValues>()
-   const { fields, append, remove } = useFieldArray({
-      control,
-      name: 'products'
+   // Mantine Form
+   const form = useForm<FormValues>({
+      initialValues: {
+         client: '',
+         date: new Date(),
+         products: formList([{ title: '', price: 0, quantity: 1, key: randomId() }]),
+      }
    })
 
-   const watchProductsArray = watch('products')
-   const controlledFields = fields.map((field, index) => {
-      return { ...field, ...watchProductsArray[index] }
-   })
+   // const methods = useReactHookForm<FormValues>({
+   //    defaultValues: {
+   //       client: 'Sin identifica',
+   //       date: new Date(),
+   //       products: [{ title: '', price: 0, quantity: 1 }]
+   //    }
+   // })
+   // const { register, handleSubmit, control, watch, setValue, getValues } = methods
+   // const { fields, append, remove } = useFieldArray({
+   //    control,
+   //    name: 'products'
+   // })
+
+   // const watchProductsArray = watch('products')
+   // const controlledFields = fields.map((field, index) => {
+   //    return { ...field, ...watchProductsArray[index] }
+   // })
 
    const onSubmit = (values: FormValues) => {
       console.log(values)
@@ -40,8 +58,24 @@ export default function NewInvoice() {
 
    return (
       <Container fluid>
+         <Paper p='sm'>
+            <Group position='apart'>
+               <Title order={2}>Nueva Factura</Title>
+               <Group >
+                  <Button color='gray'>
+                     Cancelar
+                  </Button>
+
+                  <Button>
+                     Guardar
+                  </Button>
+               </Group>
+            </Group>
+         </Paper>
+         <Space my='md' />
          <Paper p="md" mb="xl" shadow="sm">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            {/* <FormProvider {...methods}> */}
+            <form onSubmit={form.onSubmit(onSubmit)}>
                <Group grow>
                   <TextInput label='Cliente' defaultValue='Sin identificar' />
                   <DatePicker
@@ -57,24 +91,23 @@ export default function NewInvoice() {
                <Group position='apart'>
                   <Text size='xl' > Productos:</Text>
                   <Button onClick={() => {
-                     append({ quantity: 1, price: 0})
+                     // @ts-ignore
+                     form.addListItem('products', { title: '', quantity: 1, price: 0, key: randomId() })
                   }}>Agregar producto</Button>
                </Group>
                <Stack>
-                  {controlledFields.map((field, index) => (
+                  {form.values.products.map((field, index) => (
                      <InvoiceProduct
-                        key={field.id}
+                        key={field.key}
                         index={index}
                         field={field}
-                        register={register}
-                        remove={remove}
-                        setValue={setValue}
-                        getValues={getValues}
-                        watch={watch}
+                        form={form}
                      />
                   ))}
                </Stack>
+
             </form>
+            {/* </FormProvider> */}
          </Paper>
       </Container>
    )

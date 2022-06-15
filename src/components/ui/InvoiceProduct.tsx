@@ -1,51 +1,72 @@
-import { Group, TextInput, NumberInput, ActionIcon } from '@mantine/core'
-import React from 'react'
-import { UseFormGetValues, UseFormRegister, UseFormSetValue, UseFormWatch, useWatch } from 'react-hook-form';
+import { Group, Text, TextInput, NumberInput, ActionIcon, Autocomplete, Loader, Avatar, MantineColor, SelectItemProps, createStyles } from '@mantine/core'
+import { FormList } from '@mantine/form';
+import { UseFormReturnType } from '@mantine/form/lib/use-form';
+import { useDebouncedValue, useSetState } from '@mantine/hooks';
+import React, { forwardRef, useDebugValue, useEffect, useState } from 'react'
+import { FormProvider, useForm, UseFormGetValues, UseFormRegister, UseFormSetValue, UseFormWatch, useWatch } from 'react-hook-form';
 import { CurrencyDollar, Trash } from 'tabler-icons-react'
+import { ProductAutocomplete } from '.';
+import { useSearchMLItemQuery } from '../../hooks';
 
 interface FormValues {
    client: string;
-   date: string;
-   products: {
+   date: Date;
+   products: FormList<{
       title: string;
       price: number;
       quantity: number;
-   }[]
+      key: string;
+   }>
 }
 
 
 interface Props {
-   field: any
-   register: UseFormRegister<FormValues>
-   setValue: UseFormSetValue<FormValues>
-   getValues: UseFormGetValues<FormValues>
-   watch: UseFormWatch<FormValues>
+   field: {
+      title: string;
+      price: number;
+      quantity: number;
+      key: string;
+   }
    index: number
-   remove: any
+   form: UseFormReturnType<FormValues>
+   // register: UseFormRegister<FormValues>
+   // setValue: UseFormSetValue<FormValues>
+   // getValues: UseFormGetValues<FormValues>
+   // watch: UseFormWatch<FormValues>
+   // remove: any
 }
 
-export const InvoiceProduct = ({ register, index, remove, setValue, getValues, field, watch }: Props) => {
+const useStyles = createStyles((theme, _params, getRef) => ({
+   numberInput: {
 
-   const price = watch(`products.${index}.price`)
-   const quantity = watch(`products.${index}.quantity`)
+   }
+}))
+
+
+export const InvoiceProduct = ({ index, field, form }: Props) => {
+
+
+
+   // const price = watch(`products.${index}.price`)
+   // const quantity = watch(`products.${index}.quantity`)
+
 
    return (
       <Group noWrap align='end' position='apart'>
-         <TextInput
-            label='Producto'
-            sx={{ width: '320px' }}
-            {...register(`products.${index}.title`)}
-         />
+
+         <ProductAutocomplete index={index} form={form} />
          <Group>
             <NumberInput
                label='Cantidad'
                hideControls
                sx={{ maxWidth: '70px' }}
-               {...register(`products.${index}.quantity`)}
+               defaultValue={1}
+               {...form.getListInputProps('products', index, 'quantity')}
+            // {...register(`products.${index}.quantity`)}
             />
             <NumberInput
-               {...register(`products.${index}.price`)}
-               noClampOnBlur
+               // {...register(`products.${index}.price`)}
+               {...form.getListInputProps('products', index, 'price')}
                sx={{ maxWidth: '120px' }}
                hideControls
                label='Precio'
@@ -63,7 +84,7 @@ export const InvoiceProduct = ({ register, index, remove, setValue, getValues, f
                noClampOnBlur
                icon={<CurrencyDollar size='18' />}
                disabled
-               value={price * quantity}
+               value={form.values.products[index].price * form.values.products[index].quantity}
                label='Total'
                // @ts-expect-error
                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
@@ -76,9 +97,12 @@ export const InvoiceProduct = ({ register, index, remove, setValue, getValues, f
                sx={{ maxWidth: '120px' }}
             />
          </Group>
-         <ActionIcon size='lg' onClick={() => remove(index)}>
+         <ActionIcon size='lg' onClick={() => form.removeListItem('products', index)}>
             <Trash />
          </ActionIcon>
+
       </Group>
    )
 }
+
+

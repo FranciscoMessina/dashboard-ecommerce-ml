@@ -6,7 +6,7 @@ import { Notes, ShoppingCart } from 'tabler-icons-react'
 import { Sidebar } from '../ui'
 import { Topbar } from '../ui'
 
-interface LayoutProps { }
+interface LayoutProps { } 
 
 export const Layout: React.FC<LayoutProps> = () => {
    return (
@@ -38,7 +38,7 @@ export const Layout: React.FC<LayoutProps> = () => {
    )
 }
 
-const SpotlightHandler: React.FC<any> = ({ children }) => {
+const SpotlightHandler: React.FC<any> = () => {
    const { query, registerActions, removeActions } = useSpotlight()
    const navigate = useNavigate()
 

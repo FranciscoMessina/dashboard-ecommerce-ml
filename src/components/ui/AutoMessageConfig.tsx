@@ -125,7 +125,7 @@ export function AutoMessageConfig({ autoMessage }: AutoMessageConfigProps) {
             autosize
             minRows={4}
             maxRows={10}
-            readOnly={!edit}
+            disabled={!edit}
             maxLength={2000}
             {...register('message')}
           ></Textarea>

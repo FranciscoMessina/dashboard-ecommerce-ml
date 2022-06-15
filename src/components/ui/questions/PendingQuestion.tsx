@@ -17,7 +17,7 @@ import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Message } from 'tabler-icons-react'
 import { PreviousQuestions, QuestionOptionsDropdown, TypeaheadInput } from '.'
-import { getTimeAgo } from '../../../helpers'
+import { getTimeAgo, sleep } from '../../../helpers'
 import { useAxiosInstance, useUserConfigQuery } from '../../../hooks'
 import { MeliQuestionData } from '../../../types/types'
 

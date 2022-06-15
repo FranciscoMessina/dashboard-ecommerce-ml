@@ -193,7 +193,12 @@ export const TypeaheadInput: React.FC<TypeaheadInputProps> = ({ }) => {
       const { value, selectionEnd = 0 } = textareaRef.current
       const result = getActiveToken(value, selectionEnd)
 
-      if (!result?.word) return setAutocomplete({ query: '', type: '', results: [] })
+      if (!result?.word) return setAutocomplete({
+         query: '',
+         results: [],
+         type: '',
+         loading: true
+      })
 
       const { word } = result
       if (/^[@#%]\w{0,30}$/.test(word)) {
@@ -233,6 +238,15 @@ export const TypeaheadInput: React.FC<TypeaheadInputProps> = ({ }) => {
                loading: false
             }))
          })
+      } else {
+         if (!result?.word.includes('%')) {
+            setAutocomplete({
+               query: '',
+               results: [],
+               type: '',
+               loading: true
+            })
+         }
       }
    }, [query, searchMlItems, searchQuickAnswers])
 
@@ -259,7 +273,7 @@ export const TypeaheadInput: React.FC<TypeaheadInputProps> = ({ }) => {
       const newValue = replaceAt(value, replacement, result?.range[1]! + 1).trim() + ' '
 
       setAutocomplete({
-         value: newValue
+         value: newValue.trim()
       })
 
       textareaRef.current.selectionEnd = result?.range[1]! + replacement.length
@@ -335,6 +349,7 @@ export const TypeaheadInput: React.FC<TypeaheadInputProps> = ({ }) => {
                      onClick={() => {
                         setTimeout(() => clearErrors('answer'), 2800)
                      }}
+                     disabled={isSubmitting}
                   >
                      {isSubmitting ? (
                         <Loader size={32} color="#ffffff" />

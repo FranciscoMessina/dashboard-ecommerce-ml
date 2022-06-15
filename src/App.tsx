@@ -14,12 +14,14 @@ import Unauthorized from './pages/Unauthorized'
 import { Layout } from './components/layouts/GeneralLayout'
 import { QuestionsPageLayout } from './components/layouts/QuestionsPageLayout.js'
 import { PersistLogin, RequireAuth, UpdatesHandler } from './components/utils'
-import Billing from './pages/billing.page.js'
+import Billing from './pages/billing-pending.page'
 import { Home } from './pages/home.page'
 import { Missing } from './pages/not-found.page.js'
 import { SignIn } from './pages/sign-in.page'
 import { SignUp } from './pages/sign-up.page'
 import NewInvoice from './pages/new-invoice'
+import PageSelect from './pages/PageSelect'
+import { BillingLayout } from './components/layouts/BillingLayout'
 
 const PendingQuestions = React.lazy(() => import('./pages/questions.page'))
 const QuestionsHistory = React.lazy(() => import('./pages/questions-history.page'))
@@ -92,9 +94,14 @@ function App() {
                               <Route path="orders" element={<Sales />} />
 
                               <Route path="automessages" element={<Settings />} />
+                              <Route path="menu" element={<PageSelect />} />
 
                               <Route path="publish" element={<Publicator />} />
-                              <Route path="billing" element={<Billing />} />
+                              <Route path='billing' element={<BillingLayout />}>
+                                 <Route index element={<Billing />} />
+                                 <Route path="pending" element={<Billing />} />
+                                 <Route path="emitted" element={<Billing />} />
+                              </Route>
                               <Route path="billing/new" element={<NewInvoice />} />
                            </Route>
                         </Route>

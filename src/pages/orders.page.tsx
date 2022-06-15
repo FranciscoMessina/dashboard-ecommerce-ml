@@ -35,7 +35,7 @@ export default function Sales() {
    }
 
    return (
-      <Container size={1500}>
+      <Container size={1800}>
          <Group direction="column" spacing="xl" sx={{ width: '100%' }}>
             <Group sx={{ width: '100%' }}>
                <UnstyledButton
