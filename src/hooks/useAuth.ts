@@ -4,6 +4,6 @@ import { authAtom } from '../atoms/authAtom'
 
 export const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authAtom)
-  useDebugValue(auth, (auth) => (auth?.user ? 'Logged In' : 'Logged Out'))
+  useDebugValue(auth, (auth) => (auth?.userId ? 'Logged In' : 'Logged Out'))
   return { auth, setAuth }
 }

@@ -139,6 +139,7 @@ export const HistoryQuestion: React.FC<HistoryQuestionProps> = ({ question }) =>
             wordBreak: 'break-word'
           })}
         >
+          {/* @ts-ignore */}
           {question.answer.text}
         </Text>
       </Group>
@@ -150,6 +151,7 @@ export const HistoryQuestion: React.FC<HistoryQuestionProps> = ({ question }) =>
           justifyContent: 'flex-end'
         })}
       >
+          {/* @ts-ignore */}
         {new Date(question.answer.date_created).toLocaleDateString('es-ar', {
           year: 'numeric',
           month: 'long',

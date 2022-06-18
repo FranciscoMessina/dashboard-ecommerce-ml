@@ -14,7 +14,7 @@ export const UpdatesHandler: React.FC<UpdatesHandlerProps> = ({}) => {
   useEffect(() => {
     if (auth.userId) {
       const source = new EventSource(
-        `${import.meta.env.VITE_API_URL}meli/updates?id=${auth.userId}`,
+        `${import.meta.env.VITE_API_URL}/meli/updates?id=${auth.userId}`,
         {
           withCredentials: true
         }
@@ -29,12 +29,12 @@ export const UpdatesHandler: React.FC<UpdatesHandlerProps> = ({}) => {
 
         console.log(notification)
 
-        notifications.showNotification({
-          message: 'Algo paso en meli!',
-          title: 'Nueva actualización',
-          color: 'indigo',
-          autoClose: 1000
-        })
+        // notifications.showNotification({
+        //   message: 'Algo paso en meli!',
+        //   title: 'Nueva actualización',
+        //   color: 'indigo',
+        //   autoClose: 1000
+        // })
 
         // TODO: Test different accounts receiving events.
 

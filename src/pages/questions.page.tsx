@@ -56,7 +56,7 @@ export default function PendingQuestions() {
 
   const { data, isLoading, error, isError, isFetching, isSuccess } = questionsData
 
-  // console.log(data?.data)
+  console.log(data?.data)
 
   useDocumentTitle(
     `${
