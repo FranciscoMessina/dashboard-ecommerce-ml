@@ -152,13 +152,14 @@ export function Sidebar() {
       { icon: Plus, label: 'Publicar', route: '/publish' },
       { icon: Message2Code, label: 'Mensaje Automatico', route: '/automessages' },
       { icon: FileInvoice, label: 'Facturas', route: '/billing' },
+      { icon: Box, label: 'Publicaciones', route: '/items'}
    ]
 
    const { width } = useViewportSize()
 
    const alwaysShow = width > theme.breakpoints.sm
 
-   const { auth, setAuth } = useAuth()
+   const { setAuth } = useAuth()
 
    const links = navLinks.map((link, index) => <NavbarLink {...link} key={link.label} />)
 
@@ -192,7 +193,7 @@ export function Sidebar() {
                         {links}
                      </Group>
                   </Navbar.Section>
-                  <Navbar.Section mb={10}>
+                  <Navbar.Section  mb={10}>
                      <Group direction="column" align="center" spacing={1}>
                         <NavbarLink icon={GridDots} label="Menú" route="/menu" />
 

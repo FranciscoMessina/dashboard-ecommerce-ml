@@ -34,12 +34,12 @@ export function OrderDisplay({ order }: any) {
          badgeColor = ''
          break;
       case SaleChannel.ML:
-         saleChannel = 'meli'
+         saleChannel = 'ml'
          badgeColor = '#ffeb10'
 
          break;
       case SaleChannel.MS:
-         saleChannel = 'mshop'
+         saleChannel = 'ms'
          badgeColor = '#e53c8f'
 
          break;

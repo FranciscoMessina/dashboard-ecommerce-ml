@@ -101,10 +101,6 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
       loading: true
    })
 
-   // const [query] = useDebouncedValue(autocomplete.query, 1000, {
-   //    leading: false
-   // })
-
    const MlItemsQuery = useSearchMLItemQuery(autocomplete.query, {
       enabled: false
    })
@@ -115,17 +111,23 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
    const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
       titleInput.onChange(e)
 
-      setAutocomplete({ value: e.target.value })
-
-      const { value, selectionEnd = 0 } = inputRef.current!
-      const result = getActiveToken(value, selectionEnd!)
-
-      setAutocomplete({ query: result?.word.toLowerCase() })
+      setAutocomplete({ value: e.target.value, query: e.target.value })
 
    }
 
+   const [debouncedQuery] = useDebouncedValue(autocomplete.query, 1000, {
+      leading: false
+   })
+
    useEffect(() => {
-      if (!autocomplete.query) return
+      if (!autocomplete.query) {
+         setAutocomplete({
+            loading: true,
+            results: []
+         })
+      }
+
+      if (autocomplete.query.length <= 3) return
 
       searchMlItems().then((res) => {
          setAutocomplete(() => ({
@@ -134,14 +136,11 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
          }))
       })
 
-   }, [autocomplete.query, searchMlItems])
+   }, [debouncedQuery, searchMlItems])
 
    const handleChange = (data: any) => {
-      console.log(data);
-
       form.setListItem(`products`, index, { title: data.title, price: data.price, quantity: 1, key: data.id })
-      // setValue(`products.${index}.price`, data.price)
-      // setValue(`products.${index}.quantity`, 1)
+
    }
 
    return (

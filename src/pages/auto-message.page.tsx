@@ -9,8 +9,6 @@ const Settings: React.FC = () => {
 
    const { data, isError, error, isLoading } = userConfigResult
 
-   console.log(data)
-
    if (isError) {
       return <div> Error: {error?.message}</div>
    }

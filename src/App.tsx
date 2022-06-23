@@ -22,6 +22,7 @@ import { SignUp } from './pages/sign-up.page'
 import NewInvoice from './pages/new-invoice'
 import PageSelect from './pages/PageSelect'
 import { BillingLayout } from './components/layouts/BillingLayout'
+import { ItemsPage } from './pages/ItemsPage'
 
 const PendingQuestions = React.lazy(() => import('./pages/questions.page'))
 const QuestionsHistory = React.lazy(() => import('./pages/questions-history.page'))
@@ -31,10 +32,10 @@ const Publicator = React.lazy(() => import('./pages/publicator.page'))
 const MeliCallback = React.lazy(() => import('./pages/meli-callback.page'))
 const MeliLink = React.lazy(() => import('./pages/meli-link.page'))
 
-const ROLES = {
-   User: 2001,
-   Editor: 1984,
-   Admin: 5150
+enum Roles {
+   User = 2001,
+   Editor = 1984,
+   Admin = 5150
 }
 
 function App() {
@@ -59,7 +60,7 @@ function App() {
                         <Route path="auth/signup" element={<SignUp />} />
                         <Route path="auth/unauthorized" element={<Unauthorized />} />
 
-                        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+                        <Route element={<RequireAuth allowedRoles={[Roles.User]} />}>
                            <Route
                               path="auth/link-meli"
                               element={
@@ -81,7 +82,7 @@ function App() {
                         {/* Protected Routes */}
 
                         <Route path="/" element={<Layout />}>
-                           <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+                           <Route element={<RequireAuth allowedRoles={[Roles.User]} />}>
                               <Route path="/" element={<Home />} />
 
                               <Route path="questions" element={<QuestionsPageLayout />}>
@@ -92,6 +93,7 @@ function App() {
                               </Route>
 
                               <Route path="orders" element={<Sales />} />
+                              <Route path="items" element={<ItemsPage />} />
 
                               <Route path="automessages" element={<Settings />} />
                               <Route path="menu" element={<PageSelect />} />
