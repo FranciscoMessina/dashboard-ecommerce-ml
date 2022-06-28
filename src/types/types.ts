@@ -106,6 +106,7 @@ export interface MeliItem {
       attribute_group_id: string
       attribute_group_name: string
    }
+   channels: string[]
 }
 
 export interface MeliApiError {

@@ -13,7 +13,6 @@ import { QuickPublicationModal } from '../components/ui/QuickPublicationModal'
 
 export default function Publicator() {
    useDocumentTitle('Publicar')
-   const modals = useModals()
    const [showQuickPublicationModal, setShowQuickPublicationModal] = useState(false)
    const [data, setData] = useState({
       isbn: '',
