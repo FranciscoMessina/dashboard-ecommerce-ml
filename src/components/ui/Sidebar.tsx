@@ -149,7 +149,6 @@ export function Sidebar() {
          indicator: questions?.data?.total! > 0 ? questions?.data.total : undefined
       },
       { icon: Tag, label: 'Ventas', route: '/orders' },
-      { icon: Plus, label: 'Publicar', route: '/publish' },
       { icon: Message2Code, label: 'Mensaje Automatico', route: '/automessages' },
       { icon: FileInvoice, label: 'Facturas', route: '/billing' },
       { icon: Box, label: 'Publicaciones', route: '/items'}

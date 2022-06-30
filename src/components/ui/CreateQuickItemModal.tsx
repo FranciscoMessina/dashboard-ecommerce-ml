@@ -13,7 +13,7 @@ interface ModalProps {
 }
 
 
-export const QuickPublicationModal: React.FC<ModalProps> = ({ opened, close }) => {
+export const CreateQuickItemModal: React.FC<ModalProps> = ({ opened, close }) => {
    const theme = useMantineTheme()
    const axios = useAxiosInstance()
    const modals = useModals()
@@ -27,6 +27,7 @@ export const QuickPublicationModal: React.FC<ModalProps> = ({ opened, close }) =
          ms: true,
          category: 'MLA3025',
          subCategory: '',
+         condition: 'used'
       }
    })
 
@@ -70,9 +71,13 @@ export const QuickPublicationModal: React.FC<ModalProps> = ({ opened, close }) =
             title: `Links para: ${values.title}`,
             centered: true,
             children: <>
-               <TextWithCopyBtn text={mlLink} />
+               {values.ml && (
+                  <TextWithCopyBtn text={mlLink} />
+               )}
                <Space my='sm' />
-               <TextWithCopyBtn text={msLink} />
+               {values.ms && (
+                  <TextWithCopyBtn text={msLink} />
+               )}
             </>
          })
 
@@ -133,7 +138,7 @@ export const QuickPublicationModal: React.FC<ModalProps> = ({ opened, close }) =
                         {...form.getInputProps('price')}
                      />
                   </Group>
-                  <Group>
+                  <Group noWrap grow>
                      <Checkbox
                         label={<Center><TruckDelivery color={theme.colors.green[6]} size={18} /></Center>}
                         {...form.getInputProps('free_shipping', { type: 'checkbox' })}
@@ -149,6 +154,7 @@ export const QuickPublicationModal: React.FC<ModalProps> = ({ opened, close }) =
                         label='MS'
                         {...form.getInputProps('ms', { type: 'checkbox' })}
                      />
+                     <Select data={[{ value: 'new', label: 'Nuevo' }, { value: 'used', label: 'Usado' }]} {...form.getInputProps('condition')} />
                   </Group>
                </Group>
                <Space mt='sm' />

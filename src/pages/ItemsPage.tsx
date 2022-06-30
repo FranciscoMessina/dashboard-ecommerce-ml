@@ -4,7 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios'
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import { Plus } from 'tabler-icons-react'
-import { QuickPublicationModal } from '../components/ui/QuickPublicationModal'
+import { CreateQuickItemModal } from '../components/ui'
 
 import { useAxiosInstance } from '../hooks'
 import { MeliItem } from '../types/types'
@@ -40,7 +40,7 @@ export const ItemsPage = () => {
 
             <Stack mt='md'>
                {queryResult.isSuccess && queryResult.data.data.results.map((item: MeliItem) => (
-                  <Card>
+                  <Card key={item.id}>
                      <Group align='flex-start'>
                         <Image src={item.secure_thumbnail} width={100} radius='sm' />
                         <Stack spacing='sm'>
@@ -77,7 +77,7 @@ export const ItemsPage = () => {
             </Stack>
 
          </Container>
-         <QuickPublicationModal opened={showQuickPublicationModal} close={() => setShowQuickPublicationModal(false)} />
+         <CreateQuickItemModal opened={showQuickPublicationModal} close={() => setShowQuickPublicationModal(false)} />
       </>
    )
 }

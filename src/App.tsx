@@ -28,7 +28,6 @@ const PendingQuestions = React.lazy(() => import('./pages/questions.page'))
 const QuestionsHistory = React.lazy(() => import('./pages/questions-history.page'))
 const Sales = React.lazy(() => import('./pages/orders.page'))
 const Settings = React.lazy(() => import('./pages/auto-message.page'))
-const Publicator = React.lazy(() => import('./pages/publicator.page'))
 const MeliCallback = React.lazy(() => import('./pages/meli-callback.page'))
 const MeliLink = React.lazy(() => import('./pages/meli-link.page'))
 
@@ -98,7 +97,6 @@ function App() {
                               <Route path="automessages" element={<Settings />} />
                               <Route path="menu" element={<PageSelect />} />
 
-                              <Route path="publish" element={<Publicator />} />
                               <Route path='billing' element={<BillingLayout />}>
                                  <Route index element={<Billing />} />
                                  <Route path="pending" element={<Billing />} />
