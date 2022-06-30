@@ -1,18 +1,18 @@
-import { Autocomplete, Box, Button, Card, Center, Collapse, Container, Divider, Group, NumberInput, Paper, Space, Stack, Text, TextInput, Title } from '@mantine/core'
+import { Button, Container, Divider, Group, Paper, Space, Stack, Text, TextInput, Title } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
-import { randomId, useDocumentTitle } from '@mantine/hooks'
-import { useState } from 'react'
-import { Car, CurrencyDollar, FileInvoice } from 'tabler-icons-react'
-import { Invoice, ProductAutocomplete } from '../components/ui'
-import 'dayjs/locale/es'
-import { InvoiceProduct } from '../components/ui'
-import { FormProvider, useFieldArray, useForm as useReactHookForm } from 'react-hook-form'
 import { FormList, formList, useForm } from '@mantine/form'
+import { randomId, useDocumentTitle } from '@mantine/hooks'
+import 'dayjs/locale/es'
+import { Link } from 'react-router-dom'
+import { InvoiceProduct } from '../components/ui'
+import { useAxiosInstance } from '../hooks'
+import { SaleChannel } from '../types/types'
 
 interface FormValues {
    client: string;
    date: Date;
    products: FormList<{
+      id?: string | number;
       title: string;
       price: number;
       quantity: number;
@@ -23,59 +23,79 @@ interface FormValues {
 
 export default function NewInvoice() {
    useDocumentTitle('Nueva Venta')
+   const axios = useAxiosInstance()
 
-   // Mantine Form
    const form = useForm<FormValues>({
       initialValues: {
          client: '',
          date: new Date(),
-         products: formList([{ title: '', price: 0, quantity: 1, key: randomId() }]),
-      }
+         products: formList([{ id: '', title: '', price: 0, quantity: 1, key: randomId() }]),
+      },
    })
 
-   // const methods = useReactHookForm<FormValues>({
-   //    defaultValues: {
-   //       client: 'Sin identifica',
-   //       date: new Date(),
-   //       products: [{ title: '', price: 0, quantity: 1 }]
-   //    }
-   // })
-   // const { register, handleSubmit, control, watch, setValue, getValues } = methods
-   // const { fields, append, remove } = useFieldArray({
-   //    control,
-   //    name: 'products'
-   // })
 
-   // const watchProductsArray = watch('products')
-   // const controlledFields = fields.map((field, index) => {
-   //    return { ...field, ...watchProductsArray[index] }
-   // })
-
-   const onSubmit = (values: FormValues) => {
+   const onSubmit = async (values: FormValues) => {
       console.log(values)
+
+      try {
+         const response = await axios.post('/orders', {
+            ...values,
+            saleChannel: SaleChannel.LOCAL,
+            emitInvoice: true
+         })
+         console.log(response);
+
+      } catch (err) {
+         console.log(err);
+
+      }
+
+   }
+
+   const save = async () => {
+
+      try {
+         const response = await axios.post('/orders', {
+            ...form.values,
+            saleChannel: SaleChannel.LOCAL,
+            emitInvoice: false
+         })
+         console.log(response);
+
+      } catch (err) {
+         console.log(err);
+
+      }
+
+
    }
 
 
    return (
       <Container fluid>
-         <Paper p='sm'>
-            <Group position='apart'>
-               <Title order={2}>Nueva Factura</Title>
-               <Group >
-                  <Button color='gray'>
-                     Cancelar
-                  </Button>
+         <form onSubmit={form.onSubmit(onSubmit)}>
 
-                  <Button>
-                     Guardar
-                  </Button>
+            <Paper p='sm'>
+               <Group position='apart'>
+                  <Title order={2}>Nueva Factura</Title>
+                  <Group >
+                     <Button color='gray' component={Link} to='/invoices'>
+                        Cancelar
+                     </Button>
+
+                     <Button onClick={save}>
+                        Guardar
+                     </Button>
+
+                     <Button type='submit' color='green'>
+                        Emitir
+                     </Button>
+                  </Group>
                </Group>
-            </Group>
-         </Paper>
-         <Space my='md' />
-         <Paper p="md" mb="xl" shadow="sm">
-            {/* <FormProvider {...methods}> */}
-            <form onSubmit={form.onSubmit(onSubmit)}>
+            </Paper>
+            <Space my='md' />
+            <Paper p="md" mb="xl" shadow="sm">
+
                <Group grow>
                   <TextInput label='Cliente' defaultValue='Sin identificar' />
                   <DatePicker
@@ -89,26 +109,35 @@ export default function NewInvoice() {
                <Divider my='md' />
 
                <Group position='apart'>
-                  <Text size='xl' > Productos:</Text>
-                  <Button onClick={() => {
-                     // @ts-ignore
-                     form.addListItem('products', { title: '', quantity: 1, price: 0, key: randomId() })
-                  }}>Agregar producto</Button>
+                  <Group align='center'>
+                     <Text size='xl' > Productos:</Text>
+                     <Text size='xl' weight='bold'>$ {form.values.products.reduce((prev, curr) => prev + (curr.price * curr.quantity), 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</Text>
+                  </Group>
+                  <Button
+                     onClick={() => {
+                        form.addListItem('products', {
+                           id: '',
+                           title: '',
+                           quantity: 1,
+                           price: 0,
+                           key: randomId()
+                        })
+                     }}>
+                     Agregar producto
+                  </Button>
                </Group>
                <Stack>
                   {form.values.products.map((field, index) => (
                      <InvoiceProduct
                         key={field.key}
                         index={index}
-                        field={field}
                         form={form}
                      />
                   ))}
                </Stack>
 
-            </form>
-            {/* </FormProvider> */}
-         </Paper>
+            </Paper>
+         </form>
       </Container>
    )
 }

@@ -150,7 +150,7 @@ export function Sidebar() {
       },
       { icon: Tag, label: 'Ventas', route: '/orders' },
       { icon: Message2Code, label: 'Mensaje Automatico', route: '/automessages' },
-      { icon: FileInvoice, label: 'Facturas', route: '/billing' },
+      { icon: FileInvoice, label: 'Facturas', route: '/invoices' },
       { icon: Box, label: 'Publicaciones', route: '/items'}
    ]
 

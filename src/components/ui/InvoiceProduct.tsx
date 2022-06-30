@@ -12,6 +12,7 @@ interface FormValues {
    client: string;
    date: Date;
    products: FormList<{
+      id?: string | number;
       title: string;
       price: number;
       quantity: number;
@@ -21,34 +22,13 @@ interface FormValues {
 
 
 interface Props {
-   field: {
-      title: string;
-      price: number;
-      quantity: number;
-      key: string;
-   }
    index: number
    form: UseFormReturnType<FormValues>
-   // register: UseFormRegister<FormValues>
-   // setValue: UseFormSetValue<FormValues>
-   // getValues: UseFormGetValues<FormValues>
-   // watch: UseFormWatch<FormValues>
-   // remove: any
 }
 
-const useStyles = createStyles((theme, _params, getRef) => ({
-   numberInput: {
-
-   }
-}))
 
 
-export const InvoiceProduct = ({ index, field, form }: Props) => {
-
-
-
-   // const price = watch(`products.${index}.price`)
-   // const quantity = watch(`products.${index}.quantity`)
+export const InvoiceProduct = ({ index, form }: Props) => {
 
 
    return (
@@ -62,19 +42,15 @@ export const InvoiceProduct = ({ index, field, form }: Props) => {
                sx={{ maxWidth: '70px' }}
                defaultValue={1}
                {...form.getListInputProps('products', index, 'quantity')}
-            // {...register(`products.${index}.quantity`)}
             />
             <NumberInput
-               // {...register(`products.${index}.price`)}
                {...form.getListInputProps('products', index, 'price')}
                sx={{ maxWidth: '120px' }}
                hideControls
                label='Precio'
-               // @ts-expect-error
-               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+               parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                formatter={(value) =>
-                  // @ts-expect-error
-                  !Number.isNaN(parseFloat(value))
+                  !Number.isNaN(parseFloat(value!))
                      ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                      : ''
                }
@@ -86,11 +62,9 @@ export const InvoiceProduct = ({ index, field, form }: Props) => {
                disabled
                value={form.values.products[index].price * form.values.products[index].quantity}
                label='Total'
-               // @ts-expect-error
-               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+               parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                formatter={(value) =>
-                  // @ts-expect-error
-                  !Number.isNaN(parseFloat(value))
+                  !Number.isNaN(parseFloat(value!))
                      ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                      : ''
                }

@@ -65,12 +65,11 @@ export function OrderDisplay({ order }: any) {
                <Text size="sm" sx={{ fontStyle: 'italic' }}>
                   {new Date(order.createdAt).toLocaleDateString('es-AR', {
                      day: 'numeric',
-                     month: 'short',
+                     month: 'long',
                      year: 'numeric',
                      minute: 'numeric',
                      hour: 'numeric'
-                  })}{' '}
-                  Esto esta mal
+                  })}
                </Text>
             </Group>
 
@@ -82,7 +81,7 @@ export function OrderDisplay({ order }: any) {
 
          <Divider mb={6} p={0} />
          <Group px="xs" position="apart" py={6}>
-            <OrderItemInfo order={order} />
+            <OrderItemInfo item={order.items[0]} />
 
             <Group direction="column" align={'end'}>
                <Group direction="column" spacing={2}>

@@ -11,7 +11,7 @@ export default function Billing() {
    useDocumentTitle('Facturas')
 
    useEffect(() => {
-      navigate('/billing/pending')
+      navigate('/invoices/pending')
    }, [])
 
 

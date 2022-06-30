@@ -97,12 +97,12 @@ function App() {
                               <Route path="automessages" element={<Settings />} />
                               <Route path="menu" element={<PageSelect />} />
 
-                              <Route path='billing' element={<BillingLayout />}>
+                              <Route path='invoices' element={<BillingLayout />}>
                                  <Route index element={<Billing />} />
                                  <Route path="pending" element={<Billing />} />
                                  <Route path="emitted" element={<Billing />} />
                               </Route>
-                              <Route path="billing/new" element={<NewInvoice />} />
+                              <Route path="invoices/new" element={<NewInvoice />} />
                            </Route>
                         </Route>
                      </Route>

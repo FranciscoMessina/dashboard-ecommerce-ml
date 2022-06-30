@@ -28,7 +28,6 @@ const useStyles = createStyles((theme) => ({
 }))
 
 export const BillingLayout: React.FC<QuestionsPageLayout> = ({ }) => {
-   const [open, setOpen] = useState(false)
    const { classes, cx } = useStyles()
 
    return (
@@ -36,14 +35,14 @@ export const BillingLayout: React.FC<QuestionsPageLayout> = ({ }) => {
          <Group spacing={0} position="apart">
             <div>
                <NavLink
-                  to="/billing/pending"
+                  to="/invoices/pending"
                   className={({ isActive }) => cx(classes.link, { [classes.linkActive]: isActive })}
                >
                   Pendientes
                </NavLink>
 
                <NavLink
-                  to="/billing/emitted"
+                  to="/invoices/emitted"
                   className={({ isActive }) => cx(classes.link, { [classes.linkActive]: isActive })}
                   style={{ marginLeft: '5px' }}
                >
@@ -53,7 +52,7 @@ export const BillingLayout: React.FC<QuestionsPageLayout> = ({ }) => {
             <Button
                component={Link}
                rightIcon={<FileInvoice size={19} />}
-               variant='light'
+               variant='subtle'
                to='new'
             >
                Nueva Factura

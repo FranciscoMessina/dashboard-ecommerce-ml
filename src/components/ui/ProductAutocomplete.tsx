@@ -1,9 +1,9 @@
 import { Combobox } from '@headlessui/react'
-import { Paper, TextInput, Transition, ScrollArea, Group, Image, Text, createStyles } from '@mantine/core'
+import { Paper, TextInput, Transition, ScrollArea, Group, Image, Text, createStyles, Loader, Center } from '@mantine/core'
 import { FormList } from '@mantine/form'
 import { UseFormReturnType } from '@mantine/form/lib/use-form'
 import { useDebouncedValue, useMergedRef, useSetState } from '@mantine/hooks'
-import { ChangeEvent, useRef, useEffect } from 'react'
+import { ChangeEvent, useRef, useEffect, Fragment } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { getActiveToken } from '../../helpers'
 import { useSearchMLItemQuery } from '../../hooks'
@@ -65,12 +65,14 @@ interface FormValues {
    client: string;
    date: Date;
    products: FormList<{
+      id?: string | number;
       title: string;
       price: number;
       quantity: number;
       key: string;
    }>
 }
+
 
 interface Props {
    index: number;
@@ -91,9 +93,6 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
    const titleInput = form.getListInputProps('products', index, 'title')
 
 
-
-   const mergedRef = useMergedRef(inputRef)
-
    const [autocomplete, setAutocomplete] = useSetState<AutocompleteState>({
       value: titleInput.value,
       query: '',
@@ -102,7 +101,8 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
    })
 
    const MlItemsQuery = useSearchMLItemQuery(autocomplete.query, {
-      enabled: false
+      enabled: false,
+      retry: false
    })
 
    const searchMlItems = MlItemsQuery.refetch
@@ -129,18 +129,25 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
 
       if (autocomplete.query.length <= 3) return
 
+      setAutocomplete({ loading: true, results: [] })
       searchMlItems().then((res) => {
          setAutocomplete(() => ({
             results: res?.data?.data.results || [],
             loading: false
          }))
-      })
+      }).catch(err => console.log(err))
+
 
    }, [debouncedQuery, searchMlItems])
 
    const handleChange = (data: any) => {
-      form.setListItem(`products`, index, { title: data.title, price: data.price, quantity: 1, key: data.id })
+      const repeatedItem = form.values.products.find(product => product.id === data.id)
+      if (repeatedItem) {
+         repeatedItem.quantity++
+         return form.removeListItem('products', index)
+      }
 
+      form.setListItem(`products`, index, { id: data.id, title: data.title, price: data.price, quantity: 1, key: data.id })
    }
 
    return (
@@ -150,18 +157,57 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
                as={TextInput}
                className={classes.input}
                label='Titulo'
-               // {...register(`product.x.title`, {
-               //    required: {
-               //       value: true,
-               //       message: 'Es necesario completar el producto'
-               //    }
-               // })}
                onChange={handleInput}
-               ref={mergedRef}
+               ref={inputRef}
                sx={{
                   width: '100%',
                }}
             />
+            {(autocomplete.loading && autocomplete.query.length > 3) && (
+               <Combobox.Options
+                  className={classes.comboboxOptions}
+               >
+                  <Paper p='md'>
+                     <Combobox.Option value={null} as={Fragment}>
+                        {({ active }) => (
+                           <Center>
+                              <Loader size='sm' variant='dots' />
+                           </Center>
+                        )}
+                     </Combobox.Option>
+                  </Paper>
+               </Combobox.Options>
+            )}
+            {autocomplete.query.length <= 3 && (
+               <Combobox.Options
+                  className={classes.comboboxOptions}
+               >
+                  <Paper p='md'>
+                     <Combobox.Option value={null} as={Fragment}>
+                        {({ active }) => (
+                           <Center>
+                              <Text size='sm'> Por favor ingresar mas de tres letras</Text>
+                           </Center>
+                        )}
+                     </Combobox.Option>
+                  </Paper>
+               </Combobox.Options>
+            )}
+            {(!autocomplete.loading && autocomplete.results.length === 0) && (
+               <Combobox.Options
+                  className={classes.comboboxOptions}
+               >
+                  <Paper p='md'>
+                     <Combobox.Option value={null} as={Fragment}>
+                        {({ active }) => (
+                           <Center>
+                              <Text size='sm'>No se encontraron resultados</Text>
+                           </Center>
+                        )}
+                     </Combobox.Option>
+                  </Paper>
+               </Combobox.Options>
+            )}
             <Combobox.Options
                className={classes.comboboxOptions}
             >
@@ -176,6 +222,7 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
                      height: 55 * autocomplete.results.length,
                      maxHeight: 160
                   })}>
+
                   {autocomplete.results.map((item, index) => (
                      <Combobox.Option value={item} key={item.id}>
                         {({ active }) => (
@@ -196,7 +243,6 @@ export const ProductAutocomplete: React.FC<Props> = ({ index, form }) => {
                                     height: '3rem'
                                  })}
                               />
-
                               <Group direction="column" spacing={2}>
                                  <Text size="sm">{item.title}</Text>
                                  <Text size="sm">${item.price}</Text>

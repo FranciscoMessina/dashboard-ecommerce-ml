@@ -21,8 +21,6 @@ export const useAxiosInstance = () => {
         console.log(error.response.data);
         
         if (error.response?.data.action === ErrorActions.LinkMeli) {
-          console.log('hola');
-          
           navigate('/auth/link-meli')
         }
 
@@ -43,7 +41,7 @@ export const useAxiosInstance = () => {
 
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
-        if (!config?.headers!['authorization']) {
+        if (!config?.headers!['Authorization']) {
           config.headers!['Authorization'] = `Bearer ${auth?.accessToken}`
         }
         return config
